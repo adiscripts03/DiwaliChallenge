@@ -15,7 +15,9 @@ export default function HomePage() {
 
   const fetchLeaderboard = async () => {
     try {
-      const res = await fetch('/api/leaderboard');
+      const res = await fetch(`/api/leaderboard?t=${Date.now()}`, {
+        cache: 'no-store',
+      });
       const data = await res.json();
       if (data.leaderboard) {
         setUsers(data.leaderboard);
@@ -30,6 +32,12 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchLeaderboard();
+
+    // Auto-refresh leaderboard every 30 seconds so other users' solves show live
+    const interval = setInterval(() => {
+      fetchLeaderboard();
+    }, 30000);
+    return () => clearInterval(interval);
   }, []);
 
   const handleSyncUser = async (userId: string) => {

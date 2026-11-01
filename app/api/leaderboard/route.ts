@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const users = await db.getUsers();
@@ -29,11 +32,18 @@ export async function GET() {
 
     const lastSync = await db.getLastGlobalSync();
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       leaderboard: sanitized,
       lastGlobalSync: lastSync || new Date().toISOString(),
       timezone: process.env.NEXT_PUBLIC_TIMEZONE || 'Asia/Kolkata',
     });
+
+    // Ensure browsers & Next.js cache never serve stale leaderboard data
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+
+    return response;
   } catch (error: any) {
     console.error('Leaderboard fetch error:', error);
     return NextResponse.json(
