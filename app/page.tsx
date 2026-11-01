@@ -48,10 +48,10 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/90 via-[#140e09]/90 to-[#0d0a07]/90 border border-amber-900/40 p-6 sm:p-10 shadow-2xl backdrop-blur-sm">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#2a0f04]/95 via-[#1e0a03]/95 to-[#140601]/95 border border-orange-500/35 p-6 sm:p-10 shadow-2xl backdrop-blur-sm shadow-[0_0_50px_rgba(234,88,12,0.15)]">
         {/* Soft background accents */}
-        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-96 h-96 bg-yellow-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 w-96 h-96 bg-orange-600/25 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>

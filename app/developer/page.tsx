@@ -12,10 +12,10 @@ export default function DeveloperPage() {
   return (
     <div className="w-full flex-1 flex flex-col justify-center min-h-[calc(100vh-14rem)] py-2 sm:py-6">
       {/* Full-Page Hero Card */}
-      <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/95 via-[#140e09]/95 to-[#0d0a07]/95 border border-amber-900/40 p-8 sm:p-14 lg:p-16 shadow-2xl backdrop-blur-md">
+      <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#2a0f04]/95 via-[#1e0a03]/95 to-[#140601]/95 border border-orange-500/35 p-8 sm:p-14 lg:p-16 shadow-2xl backdrop-blur-md shadow-[0_0_50px_rgba(234,88,12,0.18)]">
         {/* Ambient warm glows */}
-        <div className="absolute top-0 right-0 -translate-y-16 translate-x-16 w-[500px] h-[500px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-0 translate-y-16 -translate-x-16 w-[500px] h-[500px] bg-orange-600/15 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-0 -translate-y-16 translate-x-16 w-[500px] h-[500px] bg-yellow-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 translate-y-16 -translate-x-16 w-[500px] h-[500px] bg-orange-600/25 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8 sm:gap-14 lg:gap-16 my-auto">
           {/* Photo with Glowing Halo */}
@@ -56,14 +56,14 @@ export default function DeveloperPage() {
             </p>
 
             {/* Quick badges of solo execution */}
-            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1 text-xs text-amber-200/70">
-              <span className="px-3 py-1 rounded-lg bg-amber-950/40 border border-amber-900/40">Frontend</span>
+            <div className="flex flex-wrap items-center justify-center md:justify-start gap-2 pt-1 text-xs text-amber-200/80">
+              <span className="px-3 py-1 rounded-lg bg-orange-950/50 border border-orange-800/50">Frontend</span>
               <span className="text-amber-500/40">•</span>
-              <span className="px-3 py-1 rounded-lg bg-amber-950/40 border border-amber-900/40">Backend</span>
+              <span className="px-3 py-1 rounded-lg bg-orange-950/50 border border-orange-800/50">Backend</span>
               <span className="text-amber-500/40">•</span>
-              <span className="px-3 py-1 rounded-lg bg-amber-950/40 border border-amber-900/40">Design</span>
+              <span className="px-3 py-1 rounded-lg bg-orange-950/50 border border-orange-800/50">Design</span>
               <span className="text-amber-500/40">•</span>
-              <span className="px-3 py-1 rounded-lg bg-amber-950/40 border border-amber-900/40">Platform Scrapers</span>
+              <span className="px-3 py-1 rounded-lg bg-orange-950/50 border border-orange-800/50">Platform Scrapers</span>
             </div>
 
             {/* Social Links */}

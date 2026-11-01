@@ -40,7 +40,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#120d09]/90 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-orange-950/60 bg-[#1a0a03]/90 backdrop-blur-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand with Official GDG Logo */}
         <Link href="/" className="flex items-center space-x-3 group">
