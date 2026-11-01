@@ -276,13 +276,13 @@ export default function ProfilePage() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-amber-400 uppercase tracking-wider">
-                  LeetCode
+                  LeetCode Handle / URL
                 </label>
                 <span className="text-[10px] text-slate-500">Optional</span>
               </div>
               <input
                 type="text"
-                placeholder="Leave blank if no account"
+                placeholder="Username or profile URL"
                 value={leetcode}
                 onChange={(e) => setLeetcode(e.target.value)}
                 className="w-full bg-slate-950/90 border border-amber-500/30 rounded-xl px-4 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400"
@@ -292,13 +292,13 @@ export default function ProfilePage() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-blue-400 uppercase tracking-wider">
-                  Codeforces
+                  Codeforces Handle / URL
                 </label>
                 <span className="text-[10px] text-slate-500">Optional</span>
               </div>
               <input
                 type="text"
-                placeholder="Leave blank if no account"
+                placeholder="Username or profile URL"
                 value={codeforces}
                 onChange={(e) => setCodeforces(e.target.value)}
                 className="w-full bg-slate-950/90 border border-blue-500/30 rounded-xl px-4 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-blue-400"
@@ -308,13 +308,13 @@ export default function ProfilePage() {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-semibold text-emerald-400 uppercase tracking-wider">
-                  CodeChef
+                  CodeChef Handle / URL
                 </label>
                 <span className="text-[10px] text-slate-500">Optional</span>
               </div>
               <input
                 type="text"
-                placeholder="Leave blank if no account"
+                placeholder="Username or profile URL"
                 value={codechef}
                 onChange={(e) => setCodechef(e.target.value)}
                 className="w-full bg-slate-950/90 border border-emerald-500/30 rounded-xl px-4 py-2 text-sm text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-400"

@@ -133,39 +133,39 @@ export default function RegisterPage() {
             <div className="space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-200 mb-1">
-                  LeetCode Handle <span className="text-slate-400 font-normal">(Optional)</span>
+                  LeetCode Handle / URL <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={form.leetcode}
                   onChange={(e) => setForm({ ...form, leetcode: e.target.value })}
-                  placeholder="e.g. tourist (leave blank if not using)"
+                  placeholder="e.g. tourist or https://leetcode.com/u/tourist/"
                   className="w-full bg-slate-950/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-slate-200 mb-1">
-                  Codeforces Handle <span className="text-slate-400 font-normal">(Optional)</span>
+                  Codeforces Handle / URL <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={form.codeforces}
                   onChange={(e) => setForm({ ...form, codeforces: e.target.value })}
-                  placeholder="e.g. tourist (leave blank if not using)"
+                  placeholder="e.g. tourist or https://codeforces.com/profile/tourist"
                   className="w-full bg-slate-950/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-400/40 focus:border-blue-400 transition-all"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-medium text-slate-200 mb-1">
-                  CodeChef Handle <span className="text-slate-400 font-normal">(Optional)</span>
+                  CodeChef Handle / URL <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
                   value={form.codechef}
                   onChange={(e) => setForm({ ...form, codechef: e.target.value })}
-                  placeholder="e.g. tourist (leave blank if not using)"
+                  placeholder="e.g. tourist or https://www.codechef.com/users/tourist"
                   className="w-full bg-slate-950/90 border border-slate-700/80 rounded-xl px-3.5 py-2 text-xs text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/40 focus:border-emerald-400 transition-all"
                 />
               </div>

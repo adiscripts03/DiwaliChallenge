@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { hashPassword, generateToken, TOKEN_COOKIE_NAME } from '@/lib/auth';
+import { sanitizeHandle } from '@/lib/utils/handles';
 
 export async function POST(req: Request) {
   try {
@@ -34,9 +35,9 @@ export async function POST(req: Request) {
       email: email.trim().toLowerCase(),
       passwordHash,
       handles: {
-        leetcode: leetcode?.trim() || '',
-        codeforces: codeforces?.trim() || '',
-        codechef: codechef?.trim() || '',
+        leetcode: sanitizeHandle(leetcode, 'leetcode'),
+        codeforces: sanitizeHandle(codeforces, 'codeforces'),
+        codechef: sanitizeHandle(codechef, 'codechef'),
       },
     });
 

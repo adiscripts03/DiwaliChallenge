@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
 import { syncUserSolves } from '@/lib/apis/tracker';
+import { sanitizeHandle } from '@/lib/utils/handles';
 
 export async function PUT(req: Request) {
   try {
@@ -15,9 +16,12 @@ export async function PUT(req: Request) {
     const updatedUser = await db.updateUser(currentUser.id, {
       ...(name ? { name: name.trim() } : {}),
       handles: {
-        leetcode: leetcode !== undefined ? leetcode.trim() : currentUser.handles.leetcode,
-        codeforces: codeforces !== undefined ? codeforces.trim() : currentUser.handles.codeforces,
-        codechef: codechef !== undefined ? codechef.trim() : currentUser.handles.codechef,
+        leetcode:
+          leetcode !== undefined ? sanitizeHandle(leetcode, 'leetcode') : currentUser.handles.leetcode,
+        codeforces:
+          codeforces !== undefined ? sanitizeHandle(codeforces, 'codeforces') : currentUser.handles.codeforces,
+        codechef:
+          codechef !== undefined ? sanitizeHandle(codechef, 'codechef') : currentUser.handles.codechef,
       },
     });
 
