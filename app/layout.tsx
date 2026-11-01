@@ -16,17 +16,17 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#160702] text-[#fffbeb] min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200 relative overflow-x-hidden">
+      <body className="bg-[#0d0a07] text-[#fef3c7] min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200 relative overflow-x-hidden">
         <DiyaBackground />
         <div className="relative z-10 flex flex-col min-h-screen">
           <Navbar />
           <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {children}
           </main>
-          <footer className="border-t border-orange-950/60 py-6 text-center text-xs text-orange-200/60">
+          <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-400">
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
               <span>© {new Date().getFullYear()} GDG Diwali Challenge.</span>
-              <span className="hidden sm:inline text-orange-400/30">•</span>
+              <span className="hidden sm:inline text-slate-600">•</span>
               <Link
                 href="/developer"
                 className="font-medium text-amber-400/90 hover:text-amber-300 underline decoration-dotted transition-colors"
