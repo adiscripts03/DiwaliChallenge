@@ -120,8 +120,8 @@ export default function ProfilePage() {
         throw new Error(data.error || 'Sync failed');
       }
 
-      // Start 60-second cooldown timer upon successful sync
-      setCooldownSeconds(60);
+      // Start 300-second (5 minute) cooldown timer upon successful sync
+      setCooldownSeconds(300);
 
       // Refresh current user data
       const meRes = await fetch('/api/auth/me');
@@ -181,7 +181,7 @@ export default function ProfilePage() {
               {syncing
                 ? 'Fetching from APIs...'
                 : cooldownSeconds > 0
-                ? `Wait ${cooldownSeconds}s to sync`
+                ? `Wait ${Math.floor(cooldownSeconds / 60)}m ${cooldownSeconds % 60}s to sync`
                 : 'Sync My Solves Now'}
             </span>
           </button>

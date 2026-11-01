@@ -26,17 +26,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
-    // Cooldown enforcement: 60 seconds (1 minute) per user
-    const COOLDOWN_SECONDS = 60;
+    // Cooldown enforcement: 300 seconds (5 minutes) per user
+    const COOLDOWN_SECONDS = 300;
     if (user.lastSyncAt) {
       const lastSyncTime = new Date(user.lastSyncAt).getTime();
       const nowTime = Date.now();
       const elapsedSeconds = Math.floor((nowTime - lastSyncTime) / 1000);
       if (elapsedSeconds < COOLDOWN_SECONDS) {
         const waitTime = COOLDOWN_SECONDS - elapsedSeconds;
+        const waitMinutes = Math.ceil(waitTime / 60);
         return NextResponse.json(
           {
-            error: `Please wait ${waitTime}s before syncing again to protect external platforms.`,
+            error: `Please wait ${waitTime > 60 ? `${waitMinutes}m (${waitTime}s)` : `${waitTime}s`} before syncing again.`,
             cooldownRemaining: waitTime,
           },
           { status: 429 }

@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Link from 'next/link';
 import './globals.css';
 import Navbar from '@/components/Navbar';
 import DiyaBackground from '@/components/DiyaBackground';
@@ -23,7 +24,19 @@ export default function RootLayout({
             {children}
           </main>
           <footer className="border-t border-slate-800/80 py-6 text-center text-xs text-slate-400">
-            <p>© {new Date().getFullYear()} GDG Diwali Challenge. Daily Competitive Programming Leaderboard.</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
+              <span>© {new Date().getFullYear()} GDG Diwali Challenge.</span>
+              <span className="hidden sm:inline text-slate-600">•</span>
+              <span>
+                Crafted by{' '}
+                <Link
+                  href="/developer"
+                  className="font-semibold text-amber-400 hover:text-amber-300 underline decoration-dotted transition-colors inline-flex items-center gap-1"
+                >
+                  <span>The Lone Wolf &ldquo;Aditya Singh&rdquo; 🐺</span>
+                </Link>
+              </span>
+            </div>
           </footer>
         </div>
       </body>
