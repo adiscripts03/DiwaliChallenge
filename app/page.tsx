@@ -12,6 +12,19 @@ export default function HomePage() {
   const [lastSync, setLastSync] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [syncingUserId, setSyncingUserId] = useState<string | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const res = await fetch('/api/auth/me');
+      const data = await res.json();
+      if (data?.user?.role === 'admin') {
+        setIsAdmin(true);
+      }
+    } catch {
+      // Non-admin / not logged in
+    }
+  };
 
   const fetchLeaderboard = async () => {
     try {
@@ -31,6 +44,7 @@ export default function HomePage() {
   };
 
   useEffect(() => {
+    fetchCurrentUser();
     fetchLeaderboard();
 
     // Auto-refresh leaderboard every 30 seconds so other users' solves show live
@@ -116,7 +130,7 @@ export default function HomePage() {
       </div>
 
       {/* Podium for Top 3 */}
-      {!loading && users.length > 0 && <Podium topThree={users.slice(0, 3)} />}
+      {!loading && users.length > 0 && <Podium topThree={users.slice(0, 3)} isAdmin={isAdmin} />}
 
       {/* Main Leaderboard Table */}
       <div>
@@ -139,6 +153,7 @@ export default function HomePage() {
             users={users}
             onSyncUser={handleSyncUser}
             syncingUserId={syncingUserId}
+            isAdmin={isAdmin}
           />
         )}
       </div>

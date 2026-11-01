@@ -22,9 +22,10 @@ interface LeaderboardUser {
 
 interface PodiumProps {
   topThree: LeaderboardUser[];
+  isAdmin?: boolean;
 }
 
-function renderUserBadges(user: LeaderboardUser) {
+function renderUserBadges(user: LeaderboardUser, isAdmin: boolean = false) {
   const hasHandles =
     Boolean(user.handles?.leetcode?.trim()) ||
     Boolean(user.handles?.codeforces?.trim()) ||
@@ -40,22 +41,25 @@ function renderUserBadges(user: LeaderboardUser) {
         platform="leetcode"
         handle={user.handles?.leetcode}
         count={user.stats?.leetcode || 0}
+        isAdmin={isAdmin}
       />
       <PlatformBadge
         platform="codeforces"
         handle={user.handles?.codeforces}
         count={user.stats?.codeforces || 0}
+        isAdmin={isAdmin}
       />
       <PlatformBadge
         platform="codechef"
         handle={user.handles?.codechef}
         count={user.stats?.codechef || 0}
+        isAdmin={isAdmin}
       />
     </>
   );
 }
 
-export default function Podium({ topThree }: PodiumProps) {
+export default function Podium({ topThree, isAdmin = false }: PodiumProps) {
   if (!topThree || topThree.length === 0) return null;
 
   const first = topThree[0];
@@ -92,7 +96,7 @@ export default function Podium({ topThree }: PodiumProps) {
                 <span className="text-xs font-normal text-slate-400">solved</span>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
-                {renderUserBadges(second)}
+                {renderUserBadges(second, isAdmin)}
               </div>
             </div>
           </div>
@@ -132,7 +136,7 @@ export default function Podium({ topThree }: PodiumProps) {
                 <span className="text-xs font-normal text-slate-400">solved</span>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
-                {renderUserBadges(first)}
+                {renderUserBadges(first, isAdmin)}
               </div>
             </div>
           </div>
@@ -165,7 +169,7 @@ export default function Podium({ topThree }: PodiumProps) {
                 <span className="text-xs font-normal text-slate-400">solved</span>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
-                {renderUserBadges(third)}
+                {renderUserBadges(third, isAdmin)}
               </div>
             </div>
           </div>

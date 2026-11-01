@@ -57,3 +57,4 @@ async function sanitizeExistingUsers() {
 sanitizeExistingUsers()
   .catch(console.error)
   .finally(() => prisma.$disconnect());
+

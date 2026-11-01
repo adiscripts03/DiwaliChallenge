@@ -12,6 +12,7 @@ export async function GET() {
       id: user.id,
       name: user.name,
       email: user.email,
+      role: user.role || 'user',
       handles: user.handles,
       stats: user.stats,
     },

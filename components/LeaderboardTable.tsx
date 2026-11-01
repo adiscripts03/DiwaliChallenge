@@ -26,9 +26,10 @@ interface LeaderboardTableProps {
   users: LeaderboardUser[];
   onSyncUser: (userId: string) => Promise<void>;
   syncingUserId: string | null;
+  isAdmin?: boolean;
 }
 
-export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: LeaderboardTableProps) {
+export default function LeaderboardTable({ users, onSyncUser, syncingUserId, isAdmin = false }: LeaderboardTableProps) {
   const [search, setSearch] = useState('');
   const [filterPlatform, setFilterPlatform] = useState<'all' | 'leetcode' | 'codeforces' | 'codechef'>('all');
 
@@ -176,16 +177,19 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
                               platform="leetcode"
                               handle={user.handles?.leetcode}
                               count={user.stats?.leetcode || 0}
+                              isAdmin={isAdmin}
                             />
                             <PlatformBadge
                               platform="codeforces"
                               handle={user.handles?.codeforces}
                               count={user.stats?.codeforces || 0}
+                              isAdmin={isAdmin}
                             />
                             <PlatformBadge
                               platform="codechef"
                               handle={user.handles?.codechef}
                               count={user.stats?.codechef || 0}
+                              isAdmin={isAdmin}
                             />
                           </>
                         ) : (
