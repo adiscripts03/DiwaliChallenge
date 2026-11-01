@@ -39,7 +39,7 @@ export async function fetchLeetCodeSolved(
       LEETCODE_GRAPHQL_URL,
       {
         query: RECENT_AC_QUERY,
-        variables: { username: handle.trim(), limit: 30 },
+        variables: { username: handle.trim(), limit: 100 },
       },
       {
         headers: {

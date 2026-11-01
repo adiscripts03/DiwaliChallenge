@@ -131,7 +131,7 @@ export default function ProfilePage() {
 
       setMessage({
         type: 'success',
-        text: `Sync complete! Total solved today: ${data.userSync?.stats?.todaySolved ?? 0} problems.`,
+        text: `Sync complete! Total solved in challenge: ${data.userSync?.stats?.todaySolved ?? 0} problems.`,
       });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
@@ -186,10 +186,10 @@ export default function ProfilePage() {
           </button>
         </div>
 
-        {/* Today's Solves Highlight */}
+        {/* Challenge Solves Highlight */}
         <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
           <div className="bg-slate-950/70 border border-slate-800 rounded-xl p-3.5">
-            <div className="text-xs text-slate-400">Total Solved Today</div>
+            <div className="text-xs text-slate-400">Total Solved in Challenge</div>
             <div className="text-2xl font-black text-amber-400 mt-1 flex items-center gap-1">
               <Flame className="w-5 h-5 text-amber-500" />
               <span>{user.stats?.todaySolved || 0}</span>

@@ -4,21 +4,29 @@ import { fetchCodeChefSolved, CodeChefResult } from './codechef';
 import { db, User, UserStats } from '../db';
 
 /**
+ * Returns epoch seconds for the start of the Diwali Challenge.
+ * Default is start of challenge day: November 1, 2026 00:00:00 IST.
+ */
+export function getChallengeStartTimestamp(timeZone: string = 'Asia/Kolkata'): number {
+  if (process.env.CHALLENGE_START_TIMESTAMP) {
+    const parsed = parseInt(process.env.CHALLENGE_START_TIMESTAMP, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  if (process.env.CHALLENGE_START_DATE) {
+    try {
+      const d = new Date(process.env.CHALLENGE_START_DATE);
+      return Math.floor(d.getTime() / 1000);
+    } catch {}
+  }
+  // Default to today's midnight in Asia/Kolkata: 2026-11-01 00:00:00 IST (1793471400)
+  return 1793471400;
+}
+
+/**
  * Returns midnight timestamp (epoch seconds) for today in the given timezone.
  */
 export function getStartOfTodayTimestamp(timeZone: string = 'Asia/Kolkata'): number {
-  try {
-    const now = new Date();
-    // Format current date in specified timezone (e.g. "11/1/2026")
-    const dateStr = now.toLocaleDateString('en-US', { timeZone });
-    const midnight = new Date(`${dateStr} 00:00:00`);
-    return Math.floor(midnight.getTime() / 1000);
-  } catch {
-    // Fallback to UTC midnight
-    const now = new Date();
-    now.setUTCHours(0, 0, 0, 0);
-    return Math.floor(now.getTime() / 1000);
-  }
+  return getChallengeStartTimestamp(timeZone);
 }
 
 export interface UserSyncResult {
@@ -37,17 +45,17 @@ export interface UserSyncResult {
  */
 export async function syncUserSolves(user: User): Promise<UserSyncResult> {
   const timeZone = process.env.NEXT_PUBLIC_TIMEZONE || 'Asia/Kolkata';
-  const startOfDay = getStartOfTodayTimestamp(timeZone);
+  const challengeStart = getChallengeStartTimestamp(timeZone);
 
   const [cfRes, lcRes, ccRes] = await Promise.all([
     user.handles?.codeforces?.trim()
-      ? fetchCodeforcesSolved(user.handles.codeforces.trim(), startOfDay)
+      ? fetchCodeforcesSolved(user.handles.codeforces.trim(), challengeStart)
       : Promise.resolve({ platform: 'codeforces' as const, handle: '', count: 0, problems: [] }),
     user.handles?.leetcode?.trim()
-      ? fetchLeetCodeSolved(user.handles.leetcode.trim(), startOfDay)
+      ? fetchLeetCodeSolved(user.handles.leetcode.trim(), challengeStart)
       : Promise.resolve({ platform: 'leetcode' as const, handle: '', count: 0, problems: [] }),
     user.handles?.codechef?.trim()
-      ? fetchCodeChefSolved(user.handles.codechef.trim(), startOfDay)
+      ? fetchCodeChefSolved(user.handles.codechef.trim(), challengeStart)
       : Promise.resolve({ platform: 'codechef' as const, handle: '', count: 0, problems: [] }),
   ]);
 

@@ -121,7 +121,7 @@ export default function Podium({ topThree }: PodiumProps) {
               <h3 className="font-extrabold text-white text-lg truncate">{first.name}</h3>
               <div className="flex items-center justify-center space-x-1 text-amber-400 text-xs font-semibold mt-0.5">
                 <Crown className="w-3.5 h-3.5 shrink-0" />
-                <span>Daily Champion</span>
+                <span>Challenge Leader</span>
               </div>
             </div>
 

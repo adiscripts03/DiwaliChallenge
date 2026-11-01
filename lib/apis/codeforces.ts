@@ -24,7 +24,7 @@ export async function fetchCodeforcesSolved(
   try {
     const url = `https://codeforces.com/api/user.status?handle=${encodeURIComponent(
       handle.trim()
-    )}&from=1&count=50`;
+    )}&from=1&count=100`;
 
     const response = await axios.get(url, {
       timeout: 9000,

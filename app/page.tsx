@@ -57,7 +57,7 @@ export default function HomePage() {
   };
 
   // Calculations
-  const totalSolvedToday = users.reduce((acc, u) => acc + (u.stats.todaySolved || 0), 0);
+  const totalSolvedChallenge = users.reduce((acc, u) => acc + (u.stats.todaySolved || 0), 0);
   const activeSolvers = users.filter((u) => (u.stats.todaySolved || 0) > 0).length;
 
   return (
@@ -72,13 +72,13 @@ export default function HomePage() {
           <div>
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-3">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>GDG Festive Coding Sprint</span>
+              <span>Diwali Vacation Long Challenge</span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white text-balance">
               GDG Diwali <span className="text-amber-400">Challenge</span>
             </h1>
             <p className="mt-2 text-amber-100/80 text-sm sm:text-base max-w-xl text-pretty">
-              Tracking verified solved problems today across LeetCode, Codeforces, and CodeChef.
+              Vacation long coding sprint for freshers! Tracking all verified problems solved since the challenge kicked off today. Top 3 at vacation end win prizes and awards!
             </p>
           </div>
 
@@ -98,8 +98,8 @@ export default function HomePage() {
               <Flame className="w-5 h-5" />
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-black text-white">{totalSolvedToday}</div>
-              <div className="text-xs text-slate-400">Total Solves Today</div>
+              <div className="text-xl sm:text-2xl font-black text-white">{totalSolvedChallenge}</div>
+              <div className="text-xs text-slate-400">Total Solved in Challenge</div>
             </div>
           </div>
 
@@ -109,7 +109,7 @@ export default function HomePage() {
             </div>
             <div>
               <div className="text-xl sm:text-2xl font-black text-white">{activeSolvers} / {users.length}</div>
-              <div className="text-xs text-slate-400">Coders Active Today</div>
+              <div className="text-xs text-slate-400">Active Competitors</div>
             </div>
           </div>
         </div>
@@ -132,7 +132,7 @@ export default function HomePage() {
         {loading ? (
           <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400">
             <RefreshCw className="w-6 h-6 animate-spin mx-auto text-amber-400 mb-2" />
-            <p>Fetching today&apos;s solves...</p>
+            <p>Fetching challenge scores...</p>
           </div>
         ) : (
           <LeaderboardTable

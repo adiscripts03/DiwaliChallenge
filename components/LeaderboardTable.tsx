@@ -96,8 +96,8 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
             <tr>
               <th scope="col" className="px-6 py-3.5 w-16 text-center">Rank</th>
               <th scope="col" className="px-6 py-3.5">Coder Profile</th>
-              <th scope="col" className="px-6 py-3.5">Platform Solves (Today)</th>
-              <th scope="col" className="px-6 py-3.5 text-right">Total Solved Today</th>
+              <th scope="col" className="px-6 py-3.5">Platform Solves (Challenge)</th>
+              <th scope="col" className="px-6 py-3.5 text-right">Total Challenge Solves</th>
               <th scope="col" className="px-6 py-3.5 text-center w-24">Action</th>
             </tr>
           </thead>

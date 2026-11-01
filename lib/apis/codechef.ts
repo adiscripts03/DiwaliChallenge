@@ -56,7 +56,7 @@ export async function fetchCodeChefSolved(
       totalSolved = parseInt(totalMatch[1], 10);
     }
 
-    let todayCount = 0;
+    let challengeCount = 0;
 
     // Strategy 1: Check heatmap submission stats (userDailySubmissionsStats)
     // Format: [{ "date": "2026-11-1", "value": 3 }, ...]
@@ -64,19 +64,20 @@ export async function fetchCodeChefSolved(
     if (heatmapMatch) {
       try {
         const stats: Array<{ date: string; value: number }> = JSON.parse(heatmapMatch[1]);
-        const targetDate = new Date(sinceTimestamp * 1000);
-        const year = targetDate.getFullYear();
-        const month = targetDate.getMonth() + 1; // 1-12 without leading zero
-        const day = targetDate.getDate(); // 1-31 without leading zero
+        const sinceDate = new Date(sinceTimestamp * 1000);
+        // Normalize sinceDate to midnight in local time
+        const sinceMidnight = new Date(sinceDate.getFullYear(), sinceDate.getMonth(), sinceDate.getDate()).getTime();
 
-        const targetKey = `${year}-${month}-${day}`;
-        const targetKeyWithLeadingZeros = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-        const foundDay = stats.find(
-          (entry) => entry.date === targetKey || entry.date === targetKeyWithLeadingZeros
-        );
-        if (foundDay && typeof foundDay.value === 'number') {
-          todayCount = foundDay.value;
+        for (const entry of stats) {
+          if (!entry.date || typeof entry.value !== 'number') continue;
+          // Format in heatmap is YYYY-M-D or YYYY-MM-DD
+          const parts = entry.date.split('-').map(Number);
+          if (parts.length === 3) {
+            const entryDate = new Date(parts[0], parts[1] - 1, parts[2]).getTime();
+            if (entryDate >= sinceMidnight) {
+              challengeCount += entry.value;
+            }
+          }
         }
       } catch (err: any) {
         console.warn(`Failed parsing userDailySubmissionsStats for ${cleanHandle}:`, err.message);
@@ -96,7 +97,7 @@ export async function fetchCodeChefSolved(
       }
     });
 
-    const count = todayCount > 0 ? todayCount : uniqueProblems.size;
+    const count = challengeCount > 0 ? challengeCount : uniqueProblems.size;
 
     return {
       platform: 'codechef',
