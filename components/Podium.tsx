@@ -63,11 +63,11 @@ export default function Podium({ topThree }: PodiumProps) {
   const third = topThree[2];
 
   return (
-    <div className="w-full my-8">
-      <div className="flex flex-col md:flex-row items-end justify-center gap-4 max-w-4xl mx-auto pt-6">
+    <div className="w-full my-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 items-end gap-6 max-w-4xl mx-auto pt-6">
         {/* 2nd Place */}
-        {second && (
-          <div className="w-full md:w-1/3 order-2 md:order-1 flex flex-col items-center">
+        {second ? (
+          <div className="order-2 md:order-1 flex flex-col items-center w-full">
             <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-slate-400 to-slate-200 p-0.5 shadow-lg shadow-slate-500/20 mb-3 relative group">
               <div className="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-bold text-xl text-slate-200">
                 {second.name.charAt(0)}
@@ -77,30 +77,32 @@ export default function Podium({ topThree }: PodiumProps) {
               </div>
             </div>
 
-            <div className="text-center mb-2">
-              <h3 className="font-bold text-slate-100 text-base">{second.name}</h3>
+            <div className="text-center mb-2 px-2 w-full">
+              <h3 className="font-bold text-slate-100 text-base truncate">{second.name}</h3>
               <div className="flex items-center justify-center space-x-1 text-slate-400 text-xs mt-0.5">
-                <Medal className="w-3.5 h-3.5 text-slate-400" />
+                <Medal className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                 <span>Silver Medalist</span>
               </div>
             </div>
 
-            <div className="w-full bg-slate-900/90 border border-slate-800 rounded-t-2xl p-4 flex flex-col items-center shadow-xl">
+            <div className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col items-center shadow-xl min-h-[170px] justify-between">
               <div className="text-3xl font-extrabold text-white mb-2 flex items-center gap-1.5 tabular-nums">
-                <Flame className="w-6 h-6 text-amber-500" />
+                <Flame className="w-6 h-6 text-amber-500 shrink-0" />
                 <span>{second.stats?.todaySolved || 0}</span>
-                <span className="text-xs font-normal text-slate-400">solved today</span>
+                <span className="text-xs font-normal text-slate-400">solved</span>
               </div>
-              <div className="flex flex-wrap gap-1.5 justify-center">
+              <div className="flex flex-wrap gap-1.5 justify-center w-full">
                 {renderUserBadges(second)}
               </div>
             </div>
           </div>
+        ) : (
+          <div className="hidden md:block order-1" />
         )}
 
         {/* 1st Place */}
         {first && (
-          <div className="w-full md:w-1/3 order-1 md:order-2 flex flex-col items-center z-10">
+          <div className="order-1 md:order-2 flex flex-col items-center w-full z-10">
             <div className="relative mb-3">
               <div className="absolute -top-6 left-1/2 -translate-x-1/2">
                 <Crown className="w-8 h-8 text-amber-400 drop-shadow-md" />
@@ -115,21 +117,21 @@ export default function Podium({ topThree }: PodiumProps) {
               </div>
             </div>
 
-            <div className="text-center mb-2">
-              <h3 className="font-extrabold text-white text-lg">{first.name}</h3>
+            <div className="text-center mb-2 px-2 w-full">
+              <h3 className="font-extrabold text-white text-lg truncate">{first.name}</h3>
               <div className="flex items-center justify-center space-x-1 text-amber-400 text-xs font-semibold mt-0.5">
-                <Crown className="w-3.5 h-3.5" />
+                <Crown className="w-3.5 h-3.5 shrink-0" />
                 <span>Daily Champion</span>
               </div>
             </div>
 
-            <div className="w-full bg-slate-900 border-2 border-amber-500/40 rounded-t-2xl p-5 flex flex-col items-center shadow-2xl shadow-amber-500/10">
+            <div className="w-full bg-slate-900 border-2 border-amber-500/40 rounded-2xl p-5 flex flex-col items-center shadow-2xl shadow-amber-500/10 min-h-[190px] justify-between">
               <div className="text-4xl font-black text-amber-400 mb-2 flex items-center gap-1.5 tabular-nums">
-                <Flame className="w-7 h-7 text-amber-500" />
+                <Flame className="w-7 h-7 text-amber-500 shrink-0" />
                 <span>{first.stats?.todaySolved || 0}</span>
-                <span className="text-xs font-normal text-slate-400">solved today</span>
+                <span className="text-xs font-normal text-slate-400">solved</span>
               </div>
-              <div className="flex flex-wrap gap-1.5 justify-center">
+              <div className="flex flex-wrap gap-1.5 justify-center w-full">
                 {renderUserBadges(first)}
               </div>
             </div>
@@ -137,8 +139,8 @@ export default function Podium({ topThree }: PodiumProps) {
         )}
 
         {/* 3rd Place */}
-        {third && (
-          <div className="w-full md:w-1/3 order-3 flex flex-col items-center">
+        {third ? (
+          <div className="order-3 flex flex-col items-center w-full">
             <div className="w-16 h-16 rounded-2xl bg-amber-600/30 border border-amber-600/50 p-0.5 mb-3 relative group">
               <div className="w-full h-full bg-slate-900 rounded-[14px] flex items-center justify-center font-bold text-xl text-amber-300">
                 {third.name.charAt(0)}
@@ -148,25 +150,27 @@ export default function Podium({ topThree }: PodiumProps) {
               </div>
             </div>
 
-            <div className="text-center mb-2">
-              <h3 className="font-bold text-slate-100 text-base">{third.name}</h3>
+            <div className="text-center mb-2 px-2 w-full">
+              <h3 className="font-bold text-slate-100 text-base truncate">{third.name}</h3>
               <div className="flex items-center justify-center space-x-1 text-amber-300 text-xs font-semibold mt-0.5">
-                <Award className="w-3.5 h-3.5 text-amber-400" />
+                <Award className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>Bronze Medalist</span>
               </div>
             </div>
 
-            <div className="w-full bg-slate-900/90 border border-slate-800 rounded-t-2xl p-4 flex flex-col items-center shadow-xl">
+            <div className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col items-center shadow-xl min-h-[170px] justify-between">
               <div className="text-3xl font-extrabold text-white mb-2 flex items-center gap-1.5 tabular-nums">
-                <Flame className="w-6 h-6 text-amber-500" />
+                <Flame className="w-6 h-6 text-amber-500 shrink-0" />
                 <span>{third.stats?.todaySolved || 0}</span>
-                <span className="text-xs font-normal text-slate-400">solved today</span>
+                <span className="text-xs font-normal text-slate-400">solved</span>
               </div>
-              <div className="flex flex-wrap gap-1.5 justify-center">
+              <div className="flex flex-wrap gap-1.5 justify-center w-full">
                 {renderUserBadges(third)}
               </div>
             </div>
           </div>
+        ) : (
+          <div className="hidden md:block order-3" />
         )}
       </div>
     </div>
