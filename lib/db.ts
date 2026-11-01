@@ -236,7 +236,7 @@ export const db = {
   async updateUser(id: string, updates: Partial<User>): Promise<User | null> {
     if (hasPostgresUrl()) {
       try {
-        await prisma.user.update({
+        const updated = await prisma.user.update({
           where: { id },
           data: {
             ...(updates.name ? { name: updates.name } : {}),
@@ -246,6 +246,29 @@ export const db = {
             ...(updates.lastSyncAt ? { lastSyncAt: new Date(updates.lastSyncAt) } : {}),
           },
         });
+
+        return {
+          id: updated.id,
+          name: updated.name,
+          email: updated.email,
+          passwordHash: updated.passwordHash,
+          role: updated.role as 'user' | 'admin',
+          handles: {
+            leetcode: updated.leetcode,
+            codeforces: updated.codeforces,
+            codechef: updated.codechef,
+          },
+          stats: {
+            totalSolved: updated.totalSolved ?? updated.todaySolved ?? 0,
+            todaySolved: updated.todaySolved,
+            leetcode: updated.solvedLc,
+            codeforces: updated.solvedCf,
+            codechef: updated.solvedCc,
+            lastUpdated: updated.lastUpdated.toISOString(),
+          },
+          lastSyncAt: updated.lastSyncAt ? updated.lastSyncAt.toISOString() : undefined,
+          createdAt: updated.createdAt.toISOString(),
+        };
       } catch (err: any) {
         console.warn('Prisma updateUser error:', err.message);
       }
@@ -290,7 +313,7 @@ export const db = {
             newTotal = existing.totalSolved + stats.todaySolved;
           }
 
-          await prisma.user.update({
+          const updated = await prisma.user.update({
             where: { id },
             data: {
               totalSolved: newTotal,
@@ -303,6 +326,29 @@ export const db = {
               ...(lastSyncAt ? { lastSyncAt: new Date(lastSyncAt) } : {}),
             },
           });
+
+          return {
+            id: updated.id,
+            name: updated.name,
+            email: updated.email,
+            passwordHash: updated.passwordHash,
+            role: updated.role as 'user' | 'admin',
+            handles: {
+              leetcode: updated.leetcode,
+              codeforces: updated.codeforces,
+              codechef: updated.codechef,
+            },
+            stats: {
+              totalSolved: updated.totalSolved ?? updated.todaySolved ?? 0,
+              todaySolved: updated.todaySolved,
+              leetcode: updated.solvedLc,
+              codeforces: updated.solvedCf,
+              codechef: updated.solvedCc,
+              lastUpdated: updated.lastUpdated.toISOString(),
+            },
+            lastSyncAt: updated.lastSyncAt ? updated.lastSyncAt.toISOString() : undefined,
+            createdAt: updated.createdAt.toISOString(),
+          };
         }
       } catch (err: any) {
         console.warn('Prisma updateUserStats error:', err.message);
