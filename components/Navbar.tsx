@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Trophy, LogOut, LogIn, UserPlus, Sparkles } from 'lucide-react';
+import { Trophy, LogOut, LogIn, UserPlus } from 'lucide-react';
 import GDGLogo from '@/components/GDGLogo';
 
 interface AuthUser {
@@ -56,7 +56,7 @@ export default function Navbar() {
         </Link>
 
         {/* Navigation */}
-        <nav className="flex items-center space-x-2 sm:space-x-3">
+        <nav className="flex items-center space-x-3 sm:space-x-4">
           <Link
             href="/"
             className={`flex items-center space-x-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
@@ -67,18 +67,6 @@ export default function Navbar() {
           >
             <Trophy className="w-4 h-4 text-amber-400" />
             <span>Leaderboard</span>
-          </Link>
-
-          <Link
-            href="/poster"
-            className={`flex items-center space-x-1.5 text-sm font-medium px-3 py-1.5 rounded-lg transition-colors ${
-              pathname === '/poster'
-                ? 'bg-slate-800 text-amber-400 border border-slate-700'
-                : 'text-slate-300 hover:text-white hover:bg-slate-800/60'
-            }`}
-          >
-            <Sparkles className="w-4 h-4 text-amber-400" />
-            <span>Poster</span>
           </Link>
 
           {!loading && (
