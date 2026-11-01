@@ -7,39 +7,23 @@ interface PlatformBadgeProps {
 }
 
 export default function PlatformBadge({ platform, handle, count }: PlatformBadgeProps) {
-  // If the user does not have an account on this platform, do not render a misleading badge
+  // If the user does not have an account on this platform, do not render
   if (!handle || handle.trim() === '') {
     return null;
   }
 
-  const configs = {
-    leetcode: {
-      name: 'LeetCode',
-      bgColor: 'bg-amber-500/10 border-amber-500/20 text-amber-400',
-      dotColor: 'bg-amber-400',
-    },
-    codeforces: {
-      name: 'Codeforces',
-      bgColor: 'bg-blue-500/10 border-blue-500/20 text-blue-400',
-      dotColor: 'bg-blue-400',
-    },
-    codechef: {
-      name: 'CodeChef',
-      bgColor: 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400',
-      dotColor: 'bg-emerald-400',
-    },
+  const names = {
+    leetcode: 'LeetCode',
+    codeforces: 'Codeforces',
+    codechef: 'CodeChef',
   };
 
-  const config = configs[platform];
-
   return (
-    <div
-      className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs border font-medium ${config.bgColor}`}
-    >
-      <span className={`w-1.5 h-1.5 rounded-full ${config.dotColor}`} />
-      <span className="font-semibold">{config.name}:</span>
+    <div className="inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs border border-amber-900/30 bg-[#16110a]/90 font-medium text-amber-100/90 shadow-sm">
+      <span className="w-1.5 h-1.5 rounded-full bg-amber-500/70 shrink-0" />
+      <span className="text-amber-200/80 font-medium">{names[platform]}:</span>
       <span className="font-bold text-white tabular-nums">{count}</span>
-      <span className="text-xs text-slate-300 ml-1 select-none">
+      <span className="text-xs text-amber-100/50 ml-1 select-none font-mono">
         @{handle}
       </span>
     </div>
