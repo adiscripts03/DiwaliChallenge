@@ -25,11 +25,9 @@ export interface LeaderboardUser {
 
 interface LeaderboardTableProps {
   users: LeaderboardUser[];
-  onSyncUser: (userId: string) => Promise<void>;
-  syncingUserId: string | null;
 }
 
-export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: LeaderboardTableProps) {
+export default function LeaderboardTable({ users }: LeaderboardTableProps) {
   const [search, setSearch] = useState('');
   const [filterPlatform, setFilterPlatform] = useState<'all' | 'leetcode' | 'codeforces' | 'codechef'>('all');
 
@@ -101,13 +99,12 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
               <th scope="col" className="px-6 py-3.5">Coder Profile</th>
               <th scope="col" className="px-6 py-3.5">Today's Solves by Platform</th>
               <th scope="col" className="px-6 py-3.5 text-right">Global Challenge Solves</th>
-              <th scope="col" className="px-6 py-3.5 text-center w-24">Sync Today</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60 font-medium">
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-6 py-16 text-center">
+                <td colSpan={4} className="px-6 py-16 text-center">
                   <div className="max-w-xs mx-auto space-y-3">
                     <div className="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 mx-auto flex items-center justify-center font-bold">
                       <Search className="w-5 h-5" />
@@ -129,7 +126,6 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
               </tr>
             ) : (
               filteredUsers.map((user, idx) => {
-                const isSyncing = syncingUserId === user.id;
                 const userScore = user.stats?.totalSolved ?? user.stats?.todaySolved ?? 0;
                 const percentage = Math.min(100, Math.round((userScore / maxSolved) * 100));
 
@@ -220,22 +216,6 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
                           />
                         </div>
                       </div>
-                    </td>
-
-                    {/* Action */}
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => onSyncUser(user.id)}
-                        disabled={isSyncing}
-                        title="Re-fetch submissions for this user right now"
-                        className={`p-2 rounded-lg border transition-all ${
-                          isSyncing
-                            ? 'bg-amber-500/20 border-amber-500/40 text-amber-300 animate-spin'
-                            : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:text-amber-400 hover:border-amber-400/50'
-                        }`}
-                      >
-                        <RefreshCw className="w-3.5 h-3.5" />
-                      </button>
                     </td>
                   </tr>
                 );

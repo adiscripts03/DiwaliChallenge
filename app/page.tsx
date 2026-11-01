@@ -11,7 +11,6 @@ export default function HomePage() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
   const [lastSync, setLastSync] = useState<string>('');
   const [loading, setLoading] = useState(true);
-  const [syncingUserId, setSyncingUserId] = useState<string | null>(null);
 
   const fetchLeaderboard = async () => {
     try {
@@ -39,22 +38,6 @@ export default function HomePage() {
     }, 30000);
     return () => clearInterval(interval);
   }, []);
-
-  const handleSyncUser = async (userId: string) => {
-    setSyncingUserId(userId);
-    try {
-      await fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId }),
-      });
-      await fetchLeaderboard();
-    } catch (err) {
-      console.error('User sync failed:', err);
-    } finally {
-      setSyncingUserId(null);
-    }
-  };
 
   // Calculations
   const totalSolvedChallenge = users.reduce((acc, u) => acc + (u.stats.totalSolved ?? u.stats.todaySolved ?? 0), 0);
@@ -135,11 +118,7 @@ export default function HomePage() {
             <p>Fetching challenge scores...</p>
           </div>
         ) : (
-          <LeaderboardTable
-            users={users}
-            onSyncUser={handleSyncUser}
-            syncingUserId={syncingUserId}
-          />
+          <LeaderboardTable users={users} />
         )}
       </div>
     </div>
