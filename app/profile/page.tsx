@@ -15,6 +15,7 @@ interface UserData {
     codechef: string;
   };
   stats: {
+    totalSolved?: number;
     todaySolved: number;
     leetcode: number;
     codeforces: number;
@@ -131,7 +132,7 @@ export default function ProfilePage() {
 
       setMessage({
         type: 'success',
-        text: `Sync complete! Total solved in challenge: ${data.userSync?.stats?.todaySolved ?? 0} problems.`,
+        text: `Sync complete! Solved today: ${data.userSync?.stats?.todaySolved ?? 0} (Global Total: ${data.userSync?.stats?.totalSolved ?? 0}).`,
       });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
@@ -192,7 +193,10 @@ export default function ProfilePage() {
             <div className="text-xs text-slate-400">Total Solved in Challenge</div>
             <div className="text-2xl font-black text-amber-400 mt-1 flex items-center gap-1">
               <Flame className="w-5 h-5 text-amber-500" />
-              <span>{user.stats?.todaySolved || 0}</span>
+              <span>{user.stats?.totalSolved ?? user.stats?.todaySolved ?? 0}</span>
+            </div>
+            <div className="text-[11px] text-slate-400 mt-0.5">
+              +{user.stats?.todaySolved || 0} today
             </div>
           </div>
 

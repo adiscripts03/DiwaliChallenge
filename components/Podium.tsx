@@ -12,6 +12,7 @@ interface LeaderboardUser {
     codechef: string;
   };
   stats: {
+    totalSolved?: number;
     todaySolved: number;
     leetcode: number;
     codeforces: number;
@@ -86,10 +87,14 @@ export default function Podium({ topThree }: PodiumProps) {
             </div>
 
             <div className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col items-center shadow-xl min-h-[170px] justify-between">
-              <div className="text-3xl font-extrabold text-white mb-2 flex items-center gap-1.5 tabular-nums">
-                <Flame className="w-6 h-6 text-amber-500 shrink-0" />
-                <span>{second.stats?.todaySolved || 0}</span>
-                <span className="text-xs font-normal text-slate-400">solved</span>
+              <div className="flex flex-col items-center mb-2">
+                <div className="text-3xl font-extrabold text-white flex items-center gap-1.5 tabular-nums">
+                  <Flame className="w-6 h-6 text-amber-500 shrink-0" />
+                  <span>{second.stats?.totalSolved ?? second.stats?.todaySolved ?? 0}</span>
+                </div>
+                <div className="text-xs text-slate-400 font-medium">
+                  {second.stats?.todaySolved > 0 ? `+${second.stats.todaySolved} today` : '0 today'}
+                </div>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
                 {renderUserBadges(second)}
@@ -126,10 +131,14 @@ export default function Podium({ topThree }: PodiumProps) {
             </div>
 
             <div className="w-full bg-slate-900 border-2 border-amber-500/40 rounded-2xl p-5 flex flex-col items-center shadow-2xl shadow-amber-500/10 min-h-[190px] justify-between">
-              <div className="text-4xl font-black text-amber-400 mb-2 flex items-center gap-1.5 tabular-nums">
-                <Flame className="w-7 h-7 text-amber-500 shrink-0" />
-                <span>{first.stats?.todaySolved || 0}</span>
-                <span className="text-xs font-normal text-slate-400">solved</span>
+              <div className="flex flex-col items-center mb-2">
+                <div className="text-4xl font-black text-amber-400 flex items-center gap-1.5 tabular-nums">
+                  <Flame className="w-7 h-7 text-amber-500 shrink-0" />
+                  <span>{first.stats?.totalSolved ?? first.stats?.todaySolved ?? 0}</span>
+                </div>
+                <div className="text-xs text-amber-300/80 font-medium">
+                  {first.stats?.todaySolved > 0 ? `+${first.stats.todaySolved} today` : '0 today'}
+                </div>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
                 {renderUserBadges(first)}
@@ -159,10 +168,14 @@ export default function Podium({ topThree }: PodiumProps) {
             </div>
 
             <div className="w-full bg-slate-900/90 border border-slate-800 rounded-2xl p-4 flex flex-col items-center shadow-xl min-h-[170px] justify-between">
-              <div className="text-3xl font-extrabold text-white mb-2 flex items-center gap-1.5 tabular-nums">
-                <Flame className="w-6 h-6 text-amber-500 shrink-0" />
-                <span>{third.stats?.todaySolved || 0}</span>
-                <span className="text-xs font-normal text-slate-400">solved</span>
+              <div className="flex flex-col items-center mb-2">
+                <div className="text-3xl font-extrabold text-white flex items-center gap-1.5 tabular-nums">
+                  <Flame className="w-6 h-6 text-amber-500 shrink-0" />
+                  <span>{third.stats?.totalSolved ?? third.stats?.todaySolved ?? 0}</span>
+                </div>
+                <div className="text-xs text-slate-400 font-medium">
+                  {third.stats?.todaySolved > 0 ? `+${third.stats.todaySolved} today` : '0 today'}
+                </div>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
                 {renderUserBadges(third)}

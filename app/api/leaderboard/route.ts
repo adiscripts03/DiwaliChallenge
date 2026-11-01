@@ -8,10 +8,12 @@ export async function GET() {
   try {
     const users = await db.getUsers();
 
-    // Sort descending by todaySolved, then by name
+    // Sort descending by cumulative totalSolved, then todaySolved, then by name
     const sorted = [...users].sort((a, b) => {
-      const diff = (b.stats?.todaySolved || 0) - (a.stats?.todaySolved || 0);
-      if (diff !== 0) return diff;
+      const diffTotal = (b.stats?.totalSolved || 0) - (a.stats?.totalSolved || 0);
+      if (diffTotal !== 0) return diffTotal;
+      const diffToday = (b.stats?.todaySolved || 0) - (a.stats?.todaySolved || 0);
+      if (diffToday !== 0) return diffToday;
       return a.name.localeCompare(b.name);
     });
 
@@ -21,6 +23,7 @@ export async function GET() {
       name: u.name,
       handles: u.handles,
       stats: u.stats || {
+        totalSolved: 0,
         todaySolved: 0,
         leetcode: 0,
         codeforces: 0,

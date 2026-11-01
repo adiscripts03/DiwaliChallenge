@@ -57,8 +57,8 @@ export default function HomePage() {
   };
 
   // Calculations
-  const totalSolvedChallenge = users.reduce((acc, u) => acc + (u.stats.todaySolved || 0), 0);
-  const activeSolvers = users.filter((u) => (u.stats.todaySolved || 0) > 0).length;
+  const totalSolvedChallenge = users.reduce((acc, u) => acc + (u.stats.totalSolved ?? u.stats.todaySolved ?? 0), 0);
+  const activeSolvers = users.filter((u) => (u.stats.totalSolved ?? u.stats.todaySolved ?? 0) > 0).length;
 
   return (
     <div className="space-y-8">
@@ -78,7 +78,7 @@ export default function HomePage() {
               GDG Diwali <span className="text-amber-400">Challenge</span>
             </h1>
             <p className="mt-2 text-amber-100/80 text-sm sm:text-base max-w-xl text-pretty">
-              Vacation long coding sprint for freshers! Tracking all verified problems solved since the challenge kicked off today. Top 3 at vacation end win prizes and awards!
+              Vacation long coding sprint for freshers! Tracking all verified problems solved during the Diwali vacation. Top 3 coders at the end of vacation will be awarded!
             </p>
           </div>
 

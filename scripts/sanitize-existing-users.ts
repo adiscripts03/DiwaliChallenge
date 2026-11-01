@@ -38,6 +38,7 @@ async function sanitizeExistingUsers() {
           codechef: cleanCc,
         },
         stats: {
+          totalSolved: (u as any).totalSolved || u.todaySolved || 0,
           todaySolved: u.todaySolved,
           leetcode: u.solvedLc,
           codeforces: u.solvedCf,

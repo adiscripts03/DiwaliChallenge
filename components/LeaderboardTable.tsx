@@ -14,6 +14,7 @@ export interface LeaderboardUser {
     codechef: string;
   };
   stats: {
+    totalSolved?: number;
     todaySolved: number;
     leetcode: number;
     codeforces: number;
@@ -51,10 +52,12 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
       if (filterPlatform === 'leetcode') return (b.stats?.leetcode || 0) - (a.stats?.leetcode || 0);
       if (filterPlatform === 'codeforces') return (b.stats?.codeforces || 0) - (a.stats?.codeforces || 0);
       if (filterPlatform === 'codechef') return (b.stats?.codechef || 0) - (a.stats?.codechef || 0);
-      return (b.stats?.todaySolved || 0) - (a.stats?.todaySolved || 0);
+      const bScore = b.stats?.totalSolved ?? b.stats?.todaySolved ?? 0;
+      const aScore = a.stats?.totalSolved ?? a.stats?.todaySolved ?? 0;
+      return bScore - aScore;
     });
 
-  const maxSolved = Math.max(...users.map((u) => u.stats.todaySolved), 5);
+  const maxSolved = Math.max(...users.map((u) => u.stats?.totalSolved ?? u.stats?.todaySolved ?? 0), 5);
 
   return (
     <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
@@ -96,9 +99,9 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
             <tr>
               <th scope="col" className="px-6 py-3.5 w-16 text-center">Rank</th>
               <th scope="col" className="px-6 py-3.5">Coder Profile</th>
-              <th scope="col" className="px-6 py-3.5">Platform Solves (Challenge)</th>
-              <th scope="col" className="px-6 py-3.5 text-right">Total Challenge Solves</th>
-              <th scope="col" className="px-6 py-3.5 text-center w-24">Action</th>
+              <th scope="col" className="px-6 py-3.5">Today's Solves by Platform</th>
+              <th scope="col" className="px-6 py-3.5 text-right">Global Challenge Solves</th>
+              <th scope="col" className="px-6 py-3.5 text-center w-24">Sync Today</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/60 font-medium">
@@ -127,7 +130,8 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
             ) : (
               filteredUsers.map((user, idx) => {
                 const isSyncing = syncingUserId === user.id;
-                const percentage = Math.min(100, Math.round((user.stats.todaySolved / maxSolved) * 100));
+                const userScore = user.stats?.totalSolved ?? user.stats?.todaySolved ?? 0;
+                const percentage = Math.min(100, Math.round((userScore / maxSolved) * 100));
 
                 return (
                   <tr
@@ -204,8 +208,11 @@ export default function LeaderboardTable({ users, onSyncUser, syncingUserId }: L
                             ? user.stats.codeforces
                             : filterPlatform === 'codechef'
                             ? user.stats.codechef
-                            : user.stats.todaySolved}
+                            : (user.stats.totalSolved ?? user.stats.todaySolved ?? 0)}
                         </span>
+                        <div className="text-[11px] text-slate-400 mt-0.5">
+                          {user.stats.todaySolved > 0 ? `+${user.stats.todaySolved} today` : '0 solved today'}
+                        </div>
                         <div className="w-24 bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
                           <div
                             className="bg-amber-400 h-1.5 rounded-full transition-all duration-300"

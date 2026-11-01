@@ -16,14 +16,17 @@ model User {
   leetcode     String    @default("")
   codeforces   String    @default("")
   codechef     String    @default("")
+  totalSolved  Int       @default(0)
   todaySolved  Int       @default(0)
   solvedLc     Int       @default(0)
   solvedCf     Int       @default(0)
   solvedCc     Int       @default(0)
   lastUpdated  DateTime  @default(now())
   lastSyncAt   DateTime?
+  lastDailyDate String   @default("")
   createdAt    DateTime  @default(now())
 
+  @@index([totalSolved(sort: Desc)])
   @@index([todaySolved(sort: Desc)])
 }
 

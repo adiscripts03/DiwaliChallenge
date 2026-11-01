@@ -3,6 +3,7 @@ import path from 'path';
 import { prisma } from './prisma';
 
 export interface UserStats {
+  totalSolved: number;
   todaySolved: number;
   leetcode: number;
   codeforces: number;
@@ -76,7 +77,7 @@ export const db = {
     if (hasPostgresUrl()) {
       try {
         const rows = await prisma.user.findMany({
-          orderBy: { todaySolved: 'desc' },
+          orderBy: [{ totalSolved: 'desc' }, { todaySolved: 'desc' }],
         });
         return rows.map((u) => ({
           id: u.id,
@@ -90,6 +91,7 @@ export const db = {
             codechef: u.codechef,
           },
           stats: {
+            totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
             todaySolved: u.todaySolved,
             leetcode: u.solvedLc,
             codeforces: u.solvedCf,
@@ -124,6 +126,7 @@ export const db = {
               codechef: u.codechef,
             },
             stats: {
+              totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
               todaySolved: u.todaySolved,
               leetcode: u.solvedLc,
               codeforces: u.solvedCf,
@@ -161,6 +164,7 @@ export const db = {
               codechef: u.codechef,
             },
             stats: {
+              totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
               todaySolved: u.todaySolved,
               leetcode: u.solvedLc,
               codeforces: u.solvedCf,
@@ -186,6 +190,7 @@ export const db = {
       ...user,
       id,
       stats: {
+        totalSolved: 0,
         todaySolved: 0,
         leetcode: 0,
         codeforces: 0,
@@ -263,20 +268,42 @@ export const db = {
     return dbData.users[index];
   },
 
-  async updateUserStats(id: string, stats: UserStats, lastSyncAt?: string): Promise<User | null> {
+  async updateUserStats(
+    id: string,
+    stats: UserStats,
+    lastSyncAt?: string,
+    todayDateStr?: string
+  ): Promise<User | null> {
     if (hasPostgresUrl()) {
       try {
-        await prisma.user.update({
-          where: { id },
-          data: {
-            todaySolved: stats.todaySolved,
-            solvedLc: stats.leetcode,
-            solvedCf: stats.codeforces,
-            solvedCc: stats.codechef,
-            lastUpdated: new Date(stats.lastUpdated || Date.now()),
-            ...(lastSyncAt ? { lastSyncAt: new Date(lastSyncAt) } : {}),
-          },
-        });
+        const existing = await prisma.user.findUnique({ where: { id } });
+        if (existing) {
+          const isSameDay = existing.lastDailyDate === todayDateStr;
+          let newTotal = existing.totalSolved;
+
+          if (isSameDay) {
+            // Updated earlier today: adjust total by diff in today's solves
+            const diff = stats.todaySolved - existing.todaySolved;
+            newTotal = Math.max(0, existing.totalSolved + diff);
+          } else {
+            // First sync of a new day: add today's solves to cumulative total
+            newTotal = existing.totalSolved + stats.todaySolved;
+          }
+
+          await prisma.user.update({
+            where: { id },
+            data: {
+              totalSolved: newTotal,
+              todaySolved: stats.todaySolved,
+              solvedLc: stats.leetcode,
+              solvedCf: stats.codeforces,
+              solvedCc: stats.codechef,
+              lastDailyDate: todayDateStr || existing.lastDailyDate,
+              lastUpdated: new Date(stats.lastUpdated || Date.now()),
+              ...(lastSyncAt ? { lastSyncAt: new Date(lastSyncAt) } : {}),
+            },
+          });
+        }
       } catch (err: any) {
         console.warn('Prisma updateUserStats error:', err.message);
       }
