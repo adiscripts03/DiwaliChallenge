@@ -27,15 +27,12 @@ export default function RootLayout({
             <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4">
               <span>© {new Date().getFullYear()} GDG Diwali Challenge.</span>
               <span className="hidden sm:inline text-slate-600">•</span>
-              <span className="inline-flex items-center gap-1.5">
-                <span>Made with love by</span>
-                <Link
-                  href="/developer"
-                  className="font-semibold text-amber-400 hover:text-amber-300 underline decoration-dotted transition-colors inline-flex items-center gap-1"
-                >
-                  <span>The Lone Wolf &ldquo;Aditya Singh&rdquo; 🐺</span>
-                </Link>
-              </span>
+              <Link
+                href="/developer"
+                className="font-medium text-amber-400/90 hover:text-amber-300 underline decoration-dotted transition-colors"
+              >
+                Made with love by Website Team (Lone wolf btw)
+              </Link>
             </div>
           </footer>
         </div>
