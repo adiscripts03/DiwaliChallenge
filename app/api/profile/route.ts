@@ -29,19 +29,18 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'User update failed' }, { status: 400 });
     }
 
-    // Optionally sync immediately
-    if (triggerSync) {
-      await syncUserSolves(updatedUser);
-    }
+    // Automatically trigger a sync whenever handles are modified/removed so that
+    // removed platform scores immediately deduct from the user's score and update the leaderboard.
+    const syncRes = await syncUserSolves(updatedUser);
 
     return NextResponse.json({
       success: true,
       user: {
-        id: updatedUser.id,
-        name: updatedUser.name,
+        id: syncRes.userId,
+        name: syncRes.name,
         email: updatedUser.email,
         handles: updatedUser.handles,
-        stats: updatedUser.stats,
+        stats: syncRes.stats,
       },
     });
   } catch (error: any) {
