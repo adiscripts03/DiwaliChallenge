@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { prisma } from './prisma';
+import { getTodayDateString } from './date';
 
 export interface UserStats {
   totalSolved: number;
@@ -25,6 +26,7 @@ export interface User {
   role?: 'user' | 'admin';
   handles: UserHandles;
   stats: UserStats;
+  lastDailyDate?: string;
   lastSyncAt?: string;
   createdAt: string;
 }
@@ -69,51 +71,48 @@ function saveDb(data: DatabaseSchema) {
 }
 
 function hasPostgresUrl(): boolean {
-  return Boolean(process.env.DATABASE_URL && process.env.DATABASE_URL.startsWith('postgres'));
+  return Boolean(
+    (process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL) &&
+    (process.env.DATABASE_URL_UNPOOLED?.startsWith('postgres') || process.env.DATABASE_URL?.startsWith('postgres'))
+  );
+}
+
+/**
+ * Automatically resets todaySolved and platform-specific daily counts to 0
+ * for any users whose last recorded daily date is before todayDateStr (Asia/Kolkata).
+ * Leaves totalSolved (cumulative contest total) completely intact.
+ */
+async function resetDailyStatsIfNewDay(todayDateStr: string) {
+  if (!hasPostgresUrl()) return;
+  try {
+    await prisma.user.updateMany({
+      where: {
+        lastDailyDate: { not: todayDateStr },
+      },
+      data: {
+        todaySolved: 0,
+        solvedLc: 0,
+        solvedCf: 0,
+        solvedCc: 0,
+        lastDailyDate: todayDateStr,
+      },
+    });
+  } catch (err: any) {
+    console.warn('Prisma resetDailyStatsIfNewDay error:', err.message);
+  }
 }
 
 export const db = {
   async getUsers(): Promise<User[]> {
+    const todayDateStr = getTodayDateString();
     if (hasPostgresUrl()) {
       try {
+        await resetDailyStatsIfNewDay(todayDateStr);
         const rows = await prisma.user.findMany({
           orderBy: [{ totalSolved: 'desc' }, { todaySolved: 'desc' }],
         });
-        return rows.map((u) => ({
-          id: u.id,
-          name: u.name,
-          email: u.email,
-          passwordHash: u.passwordHash,
-          role: u.role as 'user' | 'admin',
-          handles: {
-            leetcode: u.leetcode,
-            codeforces: u.codeforces,
-            codechef: u.codechef,
-          },
-          stats: {
-            totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
-            todaySolved: u.todaySolved,
-            leetcode: u.solvedLc,
-            codeforces: u.solvedCf,
-            codechef: u.solvedCc,
-            lastUpdated: u.lastUpdated.toISOString(),
-          },
-          lastSyncAt: u.lastSyncAt ? u.lastSyncAt.toISOString() : undefined,
-          createdAt: u.createdAt.toISOString(),
-        }));
-      } catch (err: any) {
-        console.warn('Prisma getUsers fallback to local file:', err.message);
-      }
-    }
-    const dbData = ensureDbFile();
-    return dbData.users;
-  },
-
-  async getUserById(id: string): Promise<User | undefined> {
-    if (hasPostgresUrl()) {
-      try {
-        const u = await prisma.user.findUnique({ where: { id } });
-        if (u) {
+        return rows.map((u) => {
+          const isToday = u.lastDailyDate === todayDateStr;
           return {
             id: u.id,
             name: u.name,
@@ -127,12 +126,64 @@ export const db = {
             },
             stats: {
               totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
-              todaySolved: u.todaySolved,
-              leetcode: u.solvedLc,
-              codeforces: u.solvedCf,
-              codechef: u.solvedCc,
+              todaySolved: isToday ? u.todaySolved : 0,
+              leetcode: isToday ? u.solvedLc : 0,
+              codeforces: isToday ? u.solvedCf : 0,
+              codechef: isToday ? u.solvedCc : 0,
               lastUpdated: u.lastUpdated.toISOString(),
             },
+            lastDailyDate: u.lastDailyDate,
+            lastSyncAt: u.lastSyncAt ? u.lastSyncAt.toISOString() : undefined,
+            createdAt: u.createdAt.toISOString(),
+          };
+        });
+      } catch (err: any) {
+        console.warn('Prisma getUsers fallback to local file:', err.message);
+      }
+    }
+    const dbData = ensureDbFile();
+    return dbData.users.map((u) => {
+      const isToday = u.lastDailyDate === todayDateStr;
+      return {
+        ...u,
+        stats: {
+          ...u.stats,
+          todaySolved: isToday ? u.stats.todaySolved : 0,
+          leetcode: isToday ? u.stats.leetcode : 0,
+          codeforces: isToday ? u.stats.codeforces : 0,
+          codechef: isToday ? u.stats.codechef : 0,
+        },
+      };
+    });
+  },
+
+  async getUserById(id: string): Promise<User | undefined> {
+    const todayDateStr = getTodayDateString();
+    if (hasPostgresUrl()) {
+      try {
+        const u = await prisma.user.findUnique({ where: { id } });
+        if (u) {
+          const isToday = u.lastDailyDate === todayDateStr;
+          return {
+            id: u.id,
+            name: u.name,
+            email: u.email,
+            passwordHash: u.passwordHash,
+            role: u.role as 'user' | 'admin',
+            handles: {
+              leetcode: u.leetcode,
+              codeforces: u.codeforces,
+              codechef: u.codechef,
+            },
+            stats: {
+              totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
+              todaySolved: isToday ? u.todaySolved : 0,
+              leetcode: isToday ? u.solvedLc : 0,
+              codeforces: isToday ? u.solvedCf : 0,
+              codechef: isToday ? u.solvedCc : 0,
+              lastUpdated: u.lastUpdated.toISOString(),
+            },
+            lastDailyDate: u.lastDailyDate,
             lastSyncAt: u.lastSyncAt ? u.lastSyncAt.toISOString() : undefined,
             createdAt: u.createdAt.toISOString(),
           };
@@ -142,16 +193,30 @@ export const db = {
       }
     }
     const dbData = ensureDbFile();
-    return dbData.users.find((u) => u.id === id);
+    const u = dbData.users.find((u) => u.id === id);
+    if (!u) return undefined;
+    const isToday = u.lastDailyDate === todayDateStr;
+    return {
+      ...u,
+      stats: {
+        ...u.stats,
+        todaySolved: isToday ? u.stats.todaySolved : 0,
+        leetcode: isToday ? u.stats.leetcode : 0,
+        codeforces: isToday ? u.stats.codeforces : 0,
+        codechef: isToday ? u.stats.codechef : 0,
+      },
+    };
   },
 
   async getUserByEmail(email: string): Promise<User | undefined> {
+    const todayDateStr = getTodayDateString();
     if (hasPostgresUrl()) {
       try {
         const u = await prisma.user.findUnique({
           where: { email: email.toLowerCase() },
         });
         if (u) {
+          const isToday = u.lastDailyDate === todayDateStr;
           return {
             id: u.id,
             name: u.name,
@@ -165,12 +230,13 @@ export const db = {
             },
             stats: {
               totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
-              todaySolved: u.todaySolved,
-              leetcode: u.solvedLc,
-              codeforces: u.solvedCf,
-              codechef: u.solvedCc,
+              todaySolved: isToday ? u.todaySolved : 0,
+              leetcode: isToday ? u.solvedLc : 0,
+              codeforces: isToday ? u.solvedCf : 0,
+              codechef: isToday ? u.solvedCc : 0,
               lastUpdated: u.lastUpdated.toISOString(),
             },
+            lastDailyDate: u.lastDailyDate,
             lastSyncAt: u.lastSyncAt ? u.lastSyncAt.toISOString() : undefined,
             createdAt: u.createdAt.toISOString(),
           };
@@ -180,7 +246,19 @@ export const db = {
       }
     }
     const dbData = ensureDbFile();
-    return dbData.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    const u = dbData.users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    if (!u) return undefined;
+    const isToday = u.lastDailyDate === todayDateStr;
+    return {
+      ...u,
+      stats: {
+        ...u.stats,
+        todaySolved: isToday ? u.stats.todaySolved : 0,
+        leetcode: isToday ? u.stats.leetcode : 0,
+        codeforces: isToday ? u.stats.codeforces : 0,
+        codechef: isToday ? u.stats.codechef : 0,
+      },
+    };
   },
 
   async createUser(user: Omit<User, 'id' | 'createdAt' | 'stats'>): Promise<User> {
@@ -297,20 +375,22 @@ export const db = {
     lastSyncAt?: string,
     todayDateStr?: string
   ): Promise<User | null> {
+    const today = todayDateStr || getTodayDateString();
     if (hasPostgresUrl()) {
       try {
         const existing = await prisma.user.findUnique({ where: { id } });
         if (existing) {
-          const isSameDay = existing.lastDailyDate === todayDateStr;
-          let newTotal = existing.totalSolved;
+          const isSameDay = existing.lastDailyDate === today;
+          const currentTotal = existing.totalSolved ?? existing.todaySolved ?? 0;
+          let newTotal = currentTotal;
 
           if (isSameDay) {
             // Updated earlier today: adjust total by diff in today's solves
             const diff = stats.todaySolved - existing.todaySolved;
-            newTotal = Math.max(0, existing.totalSolved + diff);
+            newTotal = Math.max(0, currentTotal + diff);
           } else {
             // First sync of a new day: add today's solves to cumulative total
-            newTotal = existing.totalSolved + stats.todaySolved;
+            newTotal = currentTotal + stats.todaySolved;
           }
 
           const updated = await prisma.user.update({
@@ -321,7 +401,7 @@ export const db = {
               solvedLc: stats.leetcode,
               solvedCf: stats.codeforces,
               solvedCc: stats.codechef,
-              lastDailyDate: todayDateStr || existing.lastDailyDate,
+              lastDailyDate: today,
               lastUpdated: new Date(stats.lastUpdated || Date.now()),
               ...(lastSyncAt ? { lastSyncAt: new Date(lastSyncAt) } : {}),
             },
@@ -346,6 +426,7 @@ export const db = {
               codechef: updated.solvedCc,
               lastUpdated: updated.lastUpdated.toISOString(),
             },
+            lastDailyDate: updated.lastDailyDate,
             lastSyncAt: updated.lastSyncAt ? updated.lastSyncAt.toISOString() : undefined,
             createdAt: updated.createdAt.toISOString(),
           };
@@ -360,6 +441,7 @@ export const db = {
     if (index === -1) return null;
 
     dbData.users[index].stats = stats;
+    dbData.users[index].lastDailyDate = today;
     if (lastSyncAt) {
       dbData.users[index].lastSyncAt = lastSyncAt;
     }

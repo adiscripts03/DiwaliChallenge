@@ -2,42 +2,9 @@ import { fetchCodeforcesSolved, CodeforcesResult } from './codeforces';
 import { fetchLeetCodeSolved, LeetCodeResult } from './leetcode';
 import { fetchCodeChefSolved, CodeChefResult } from './codechef';
 import { db, User, UserStats } from '../db';
+import { getStartOfTodayTimestamp, getTodayDateString, CHALLENGE_TIMEZONE } from '../date';
 
-/**
- * Returns midnight timestamp (epoch seconds) for today in the given timezone.
- */
-export function getStartOfTodayTimestamp(timeZone: string = 'Asia/Kolkata'): number {
-  try {
-    const now = new Date();
-    // Format current date in specified timezone (e.g. "11/1/2026")
-    const dateStr = now.toLocaleDateString('en-US', { timeZone });
-    const midnight = new Date(`${dateStr} 00:00:00`);
-    return Math.floor(midnight.getTime() / 1000);
-  } catch {
-    const now = new Date();
-    now.setUTCHours(0, 0, 0, 0);
-    return Math.floor(now.getTime() / 1000);
-  }
-}
-
-/**
- * Returns today's date string (e.g. "2026-11-01") in the target timezone.
- */
-export function getTodayDateString(timeZone: string = 'Asia/Kolkata'): string {
-  try {
-    const now = new Date();
-    // Format YYYY-MM-DD
-    const formatter = new Intl.DateTimeFormat('en-CA', {
-      timeZone,
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-    return formatter.format(now);
-  } catch {
-    return new Date().toISOString().split('T')[0];
-  }
-}
+export { getStartOfTodayTimestamp, getTodayDateString };
 
 export interface UserSyncResult {
   userId: string;
