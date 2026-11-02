@@ -12,7 +12,7 @@ GDG brings you an exclusive 9-day competitive coding challenge designed speciall
 | Detail | Information |
 | :--- | :--- |
 | **Event** | GDG Diwali Challenge 2026 |
-| **Duration** | **3rd November – 12th November 2026** (9-Day Sprint) |
+| **Duration** | **3rd November – 12th November 2026** (10-Day Sprint) |
 | **Target Audience** | 1st-Year Freshers only |
 | **Platforms Supported** | **LeetCode** • **Codeforces** • **CodeChef** |
 | **Official Portal** | [diwalichallenge.onrender.com](https://diwalichallenge.onrender.com/) |
@@ -48,7 +48,7 @@ To be eligible for rankings and prizes, participants must be members of all thre
 
 - **Live Standings**: Track individual solve counts per platform (`LC`, `CF`, `CC`), today's daily sprint count, and cumulative challenge solves.
 - **Podium Showcase**: Top 3 performers are displayed prominently in the golden Diwali podium.
-- **Exclusive Awards**: The **Top 3 performers** at the end of the 9-day challenge will be awarded exclusive prizes!
+- **Exclusive Awards**: The **Top 3 performers** at the end of the 10-day challenge will be awarded exclusive prizes!
 
 ---
 
