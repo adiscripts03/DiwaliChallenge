@@ -40,3 +40,4 @@ export function getStartOfTodayTimestamp(timeZone: string = CHALLENGE_TIMEZONE):
     return Math.floor(now.getTime() / 1000);
   }
 }
+

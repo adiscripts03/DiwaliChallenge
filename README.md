@@ -1,86 +1,77 @@
-# 🏆 DailyCodePulse — Multi-Platform Daily Coding Leaderboard
+# 🪔 GDG Diwali Challenge 2026
 
-A full-stack, production-ready web application that tracks how many competitive programming problems users solve **today** across **LeetCode**, **Codeforces**, and **CodeChef**, and displays them on a real-time competitive leaderboard with user authentication and profile management.
+**Official Real-Time Multi-Platform Competitive Coding Leaderboard**  
+Live Website: **[https://diwalichallenge.onrender.com/](https://diwalichallenge.onrender.com/)**
 
----
-
-## ⚡ Features
-
-- **Multi-Platform Daily Solves Tracker**:
-  - **LeetCode**: Unauthenticated GraphQL queries (`recentAcSubmissionList`).
-  - **Codeforces**: Official REST API (`/api/user.status`) filtering by `verdict === "OK"`.
-  - **CodeChef**: Profile scraper analyzing recent accepted submissions.
-- **Start-of-Today Timezone Support**: Correctly checks midnight boundaries based on your timezone (configured via `NEXT_PUBLIC_TIMEZONE`, default `Asia/Kolkata` or `UTC`).
-- **Real-Time Daily Leaderboard**:
-  - Interactive Podium highlighting the **Gold**, **Silver**, and **Bronze** champions of the day.
-  - Search by coder name or platform handle.
-  - Filter tabs: **All Combined**, **LeetCode Only**, **Codeforces Only**, **CodeChef Only**.
-  - One-click global "Sync All Solves" or per-user refresh buttons.
-- **Basic Auth & User Profiles**:
-  - Secure registration and login with `bcryptjs` password hashing and HTTP-only `JWT` cookies.
-  - User dashboard to connect and edit their LeetCode, Codeforces, and CodeChef handles anytime.
-  - "Sync My Solves Now" button to verify and test handles immediately.
-- **Zero-Setup File Database**:
-  - Uses a lightweight, persistent JSON database in `data/db.json`.
-  - Zero external database services (MongoDB/Postgres) needed to test or run!
+GDG brings you an exclusive 9-day competitive coding challenge designed specially for 1st-year freshers! Track verified problems solved across **LeetCode**, **Codeforces**, and **CodeChef** on a festive, real-time leaderboard.
 
 ---
 
-## 🚀 Getting Started
+## 📅 Challenge Overview
 
-### 1. Open in Antigravity or Terminal
-Navigate into this project directory:
-```bash
-cd /Users/adityasingh/coding-leaderboard
-```
-
-### 2. Run the Development Server
-```bash
-npm run dev
-```
-
-Open your browser at **[http://localhost:3000](http://localhost:3000)**.
+| Detail | Information |
+| :--- | :--- |
+| **Event** | GDG Diwali Challenge 2026 |
+| **Duration** | **3rd November – 12th November 2026** (9-Day Sprint) |
+| **Target Audience** | 1st-Year Freshers only |
+| **Platforms Supported** | **LeetCode** • **Codeforces** • **CodeChef** |
+| **Official Portal** | [diwalichallenge.onrender.com](https://diwalichallenge.onrender.com/) |
+| **Login Credentials** | Use your registered college **BT ID** / Email |
+| **Timezone** | `Asia/Kolkata` (IST - UTC+05:30) |
 
 ---
 
-## 🔑 Demo Login
+## 📌 Mandatory Prerequisites
 
-If you want to quickly test the application without creating a new user:
-- **Email**: `alex@example.com`
-- **Password**: `password123`
-
-Or simply click the **"Click here to use demo account"** button on the `/login` page.
+To be eligible for rankings and prizes, participants must be members of all three:
+1. **GDG Community 2026–27**
+2. **GDG WhatsApp Channel**
+3. **CP / DSA WhatsApp Group**
 
 ---
 
-## 🛠️ API Implementations Explained
+## ⚡ Daily Progress Tracking & Contest Rules
 
-### 1. LeetCode GraphQL API (`lib/apis/leetcode.ts`)
-Queries LeetCode's public GraphQL endpoint without requiring private session cookies:
-```graphql
-query recentAcSubmissions($username: String!, $limit: Int!) {
-  recentAcSubmissionList(username: $username, limit: $limit) {
-    id
-    title
-    titleSlug
-    timestamp
-  }
-}
-```
-Filters `timestamp >= startOfTodayTimestamp` and counts unique solved problem slugs.
+- **Nightly Manual Sync**:
+  - Every participant must log in and click **"Sync My Solves Now"** on their [Profile Dashboard](https://diwalichallenge.onrender.com/profile) every night to record problems solved that day.
+- **Daily Window**:
+  - Only questions solved and synced on that calendar day (since 12:00:00 AM IST) count towards your score.
+  - **Unsynced questions will NOT be considered.**
+- **Rate-Limiting Protection**:
+  - A 5-minute cooldown timer is enforced per participant to prevent platform API rate-limits and IP blocking.
+- **Automatic Midnight Rollover**:
+  - At midnight IST, the leaderboard daily counter automatically resets for the new day while preserving everyone's cumulative contest total.
 
-### 2. Codeforces REST API (`lib/apis/codeforces.ts`)
-Queries the official Codeforces API:
-```
-GET https://codeforces.com/api/user.status?handle={username}&from=1&count=50
-```
-Filters for submissions where:
-- `creationTimeSeconds >= startOfTodayTimestamp`
-- `verdict === "OK"`
-De-duplicates multiple submissions for the same problem ID (`contestId + index`).
+---
 
-### 3. CodeChef Profile Parser (`lib/apis/codechef.ts`)
-Inspects the user's public profile page (`https://www.codechef.com/users/{username}`) with `cheerio` to extract recent activity and accepted solution records.
+## 🏆 Leaderboard & Rewards
+
+- **Live Standings**: Track individual solve counts per platform (`LC`, `CF`, `CC`), today's daily sprint count, and cumulative challenge solves.
+- **Podium Showcase**: Top 3 performers are displayed prominently in the golden Diwali podium.
+- **Exclusive Awards**: The **Top 3 performers** at the end of the 9-day challenge will be awarded exclusive prizes!
+
+---
+
+## ⚖️ Code of Conduct
+
+- **Zero-Tolerance for Cheating**: Cheating, code plagiarism, or using multiple accounts is strictly prohibited.
+- **No Duplicate Submissions**: Submitting identical or copied code across accounts will lead to immediate disqualification.
+- **Fair Play**: Problem submissions must be authentic and verified on your linked competitive coding profiles.
+
+---
+
+## 🛠️ Tech Stack & Architecture
+
+- **Frontend & App Framework**: [Next.js 14](https://nextjs.org/) (App Router), React, [Tailwind CSS](https://tailwindcss.com/), Lucide Icons
+- **Database & Storage**: [Neon Serverless PostgreSQL](https://neon.tech/) with [Prisma ORM](https://www.prisma.io/)
+  - Multi-AZ durability and continuous Write-Ahead Log (WAL) backups on AWS.
+  - Automated manual snapshots and point-in-time recovery (PITR).
+  - Stateless frontend compute on [Render](https://render.com/) decoupled from the database.
+- **Authentication**: Secure `bcryptjs` password hashing, HTTP-only signed JWT cookies.
+- **Scrapers & Trackers**:
+  - **LeetCode**: GraphQL `recentAcSubmissionList` query filtering unique AC slugs.
+  - **Codeforces**: Official REST API (`/api/user.status`) filtering `verdict === "OK"`.
+  - **CodeChef**: Live submissions scraper analyzing accepted 100-pt solutions since midnight IST.
 
 ---
 
@@ -91,36 +82,84 @@ coding-leaderboard/
 ├── app/
 │   ├── api/
 │   │   ├── auth/
-│   │   │   ├── register/route.ts   # Registration & JWT cookie
-│   │   │   ├── login/route.ts      # Authentication
-│   │   │   ├── me/route.ts         # Current session info
-│   │   │   └── logout/route.ts     # Cookie clear
-│   │   ├── leaderboard/route.ts    # Ranked user list
-│   │   ├── sync/route.ts           # Sync trigger for all or single user
-│   │   └── profile/route.ts        # Handle updates
-│   ├── login/page.tsx              # Sign In UI
-│   ├── register/page.tsx           # Sign Up UI
-│   ├── profile/page.tsx            # User handle manager
-│   ├── globals.css                 # Dark theme & Tailwind styles
-│   ├── layout.tsx                  # Root layout & Navigation
-│   └── page.tsx                    # Main Leaderboard & Podium view
+│   │   │   ├── register/route.ts     # User registration (college BT ID)
+│   │   │   ├── login/route.ts        # Authentication & JWT session
+│   │   │   ├── me/route.ts           # Current authenticated user
+│   │   │   └── logout/route.ts       # Session termination
+│   │   ├── leaderboard/route.ts      # Live ranked standings API
+│   │   ├── sync/route.ts             # Per-user solve synchronization (5m cooldown)
+│   │   └── profile/route.ts          # Handle linking & immediate recalibration
+│   ├── developer/page.tsx            # Solo architect & developer credits
+│   ├── login/page.tsx                # Sign In page (with password visibility toggle)
+│   ├── register/page.tsx             # Sign Up page (with password visibility toggle)
+│   ├── profile/page.tsx              # User dashboard & manual sync center
+│   ├── globals.css                   # Festive dark theme & radiant Diya glow
+│   ├── layout.tsx                    # Root layout with header, footer & nav
+│   └── page.tsx                      # Main Leaderboard, Podium & live metrics
 ├── components/
-│   ├── Navbar.tsx                  # Top navigation & user status
-│   ├── Podium.tsx                  # Top 3 winners display
-│   ├── LeaderboardTable.tsx        # Filterable & searchable table
-│   └── PlatformBadge.tsx           # Platform tag indicators
+│   ├── Navbar.tsx                    # Sticky branding navbar with GDG logo
+│   ├── Podium.tsx                    # Top 3 medalists showcase
+│   ├── LeaderboardTable.tsx          # Searchable, platform-filterable table
+│   ├── PlatformBadge.tsx             # Verified platform handles & counts
+│   └── DiyaBackground.tsx            # Luminous festive Diwali terracotta Diyas
 ├── lib/
 │   ├── apis/
-│   │   ├── leetcode.ts             # LeetCode GraphQL fetcher
-│   │   ├── codeforces.ts           # Codeforces REST fetcher
-│   │   ├── codechef.ts             # CodeChef parser
-│   │   └── tracker.ts              # Timezone & batch aggregator
-│   ├── auth.ts                     # Password hashing & JWT helpers
-│   └── db.ts                       # Persistent file-based store
-├── data/
-│   └── db.json                     # Persistent user & stats storage
-├── .env.local                      # Environment variables & timezone
-├── package.json
-└── tsconfig.json
+│   │   ├── leetcode.ts               # LeetCode GraphQL fetcher
+│   │   ├── codeforces.ts             # Codeforces REST API fetcher
+│   │   ├── codechef.ts               # CodeChef accepted submissions parser
+│   │   └── tracker.ts                # Multi-platform synchronization engine
+│   ├── auth.ts                       # Password hashing & JWT helpers
+│   ├── date.ts                       # Asia/Kolkata timezone & midnight calculators
+│   ├── db.ts                         # Neon PostgreSQL database interface
+│   └── prisma.ts                     # Prisma client instance
+├── prisma/
+│   └── schema.prisma                 # PostgreSQL data models & indexes
+├── public/
+│   └── images/                       # Festive graphics & profile assets
+├── tailwind.config.js                # Custom Diwali amber/orange palette
+└── package.json
 ```
 
+---
+
+## 🚀 Local Development Setup
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/adiscripts03/DiwaliChallenge.git
+   cd DiwaliChallenge
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+
+3. **Configure environment variables**:
+   Create a `.env` file:
+   ```env
+   DATABASE_URL="postgresql://neondb_owner:...@ep-...neon.tech/neondb?sslmode=require"
+   JWT_SECRET="your_secure_jwt_secret"
+   NEXT_PUBLIC_TIMEZONE="Asia/Kolkata"
+   ```
+
+4. **Initialize Prisma Client**:
+   ```bash
+   npx prisma generate
+   ```
+
+5. **Start the local dev server**:
+   ```bash
+   npm run dev
+   ```
+   Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+---
+
+## 👨‍💻 Developer & Team
+
+Built with ❤️ by the **Website Team** (**Aditya Singh**).
+
+- **GitHub**: [@adiscripts03](https://github.com/adiscripts03)
+- **LinkedIn**: [Aditya Singh](https://www.linkedin.com/in/aditya-singh-80827935a/)
+- **Live Leaderboard**: [https://diwalichallenge.onrender.com/](https://diwalichallenge.onrender.com/)
