@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import './globals.css';
 import Navbar from '@/components/Navbar';
+import DailySyncReminderBanner from '@/components/DailySyncReminderBanner';
 import DiyaBackground from '@/components/DiyaBackground';
 import FooterViewCounter from '@/components/FooterViewCounter';
 
@@ -21,6 +22,7 @@ export default function RootLayout({
         <DiyaBackground />
         <div className="relative z-10 flex flex-col min-h-screen">
           <Navbar />
+          <DailySyncReminderBanner />
           <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {children}
           </main>

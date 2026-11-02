@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Save, RefreshCw, CheckCircle2, AlertCircle, Flame, ExternalLink } from 'lucide-react';
+import { User, Save, RefreshCw, CheckCircle2, AlertCircle, Flame, ExternalLink, Clock } from 'lucide-react';
 import PlatformBadge from '@/components/PlatformBadge';
 
 interface UserData {
@@ -186,24 +186,38 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <button
-            onClick={handleSyncNow}
-            disabled={syncing || cooldownSeconds > 0}
-            className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all ${
-              syncing || cooldownSeconds > 0
-                ? 'bg-amber-500/20 text-amber-300/60 border border-amber-500/20 cursor-not-allowed'
-                : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 hover:scale-105'
-            }`}
-          >
-            <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
-            <span>
-              {syncing
-                ? 'Fetching from APIs...'
-                : cooldownSeconds > 0
-                ? `Wait ${Math.floor(cooldownSeconds / 60)}m ${cooldownSeconds % 60}s to sync`
-                : 'Sync My Solves Now'}
-            </span>
-          </button>
+          <div className="flex flex-col sm:items-end gap-1.5 w-full sm:w-auto">
+            <button
+              onClick={handleSyncNow}
+              disabled={syncing || cooldownSeconds > 0}
+              className={`flex items-center justify-center space-x-2 px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all ${
+                syncing || cooldownSeconds > 0
+                  ? 'bg-amber-500/20 text-amber-300/60 border border-amber-500/20 cursor-not-allowed'
+                  : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 hover:scale-105'
+              }`}
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${syncing ? 'animate-spin' : ''}`} />
+              <span>
+                {syncing
+                  ? 'Fetching from APIs...'
+                  : cooldownSeconds > 0
+                  ? `Wait ${Math.floor(cooldownSeconds / 60)}m ${cooldownSeconds % 60}s to sync`
+                  : 'Sync My Solves Now'}
+              </span>
+            </button>
+            <div className="text-[11px] text-amber-400/80 flex items-center justify-center sm:justify-end gap-1 font-medium">
+              <Clock className="w-3 h-3 text-amber-400" />
+              <span>Sync cutoff is 11:59 PM IST tonight</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Nightly Sync Callout */}
+        <div className="mt-4 p-3 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-start space-x-2.5 text-xs text-amber-200/90">
+          <Clock className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <p>
+            <strong className="text-amber-300 font-bold">Mandatory Daily Tracking:</strong> Please manually sync all your solved questions before going to sleep. Only synced questions will count towards the leaderboard — unsynced questions will not be considered!
+          </p>
         </div>
 
         {/* Challenge Solves Highlight */}

@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Podium from '@/components/Podium';
 import LeaderboardTable, { LeaderboardUser } from '@/components/LeaderboardTable';
+import DailySyncWidget from '@/components/DailySyncWidget';
 import { DiyaGraphic } from '@/components/DiyaBackground';
 import { RefreshCw, Users, Flame, Sparkles } from 'lucide-react';
 
@@ -99,6 +100,9 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Daily Progress Sync Notice & Midnight Countdown */}
+      <DailySyncWidget />
 
       {/* Podium for Top 3 */}
       {!loading && users.length > 0 && <Podium topThree={users.slice(0, 3)} />}
