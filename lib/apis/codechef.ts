@@ -11,6 +11,51 @@ export interface CodeChefResult {
 }
 
 /**
+ * Helper to parse CodeChef submission timestamps into epoch ms.
+ * Supports both relative ("23 hours ago", "5 min ago", "45 secs ago")
+ * and absolute timestamps ("10:32 PM 27/10/26", format: hh:mm A DD/MM/YY in IST).
+ */
+function parseCodeChefTime(timeStr: string, nowMs: number): number {
+  if (!timeStr) return 0;
+
+  // Relative format: e.g. "5 hours ago", "30 minutes ago", "10 seconds ago", "1 day ago"
+  const relMatch = timeStr.match(/(\d+)\s*(sec|min|hour|day)/i);
+  if (relMatch) {
+    const val = parseInt(relMatch[1], 10);
+    const unit = relMatch[2].toLowerCase();
+    const mult =
+      unit.startsWith('sec')
+        ? 1000
+        : unit.startsWith('min')
+        ? 60 * 1000
+        : unit.startsWith('hour')
+        ? 3600 * 1000
+        : 86400 * 1000;
+    return nowMs - val * mult;
+  }
+
+  // Absolute format: "hh:mm A DD/MM/YY" e.g. "10:32 PM 27/10/26" in IST (+05:30)
+  const absMatch = timeStr.match(/(\d{1,2}):(\d{2})\s*(AM|PM)\s+(\d{1,2})\/(\d{1,2})\/(\d{2,4})/i);
+  if (absMatch) {
+    const [, h, m, meridiem, d, mo, y] = absMatch;
+    let hour = parseInt(h, 10);
+    if (meridiem.toUpperCase() === 'PM' && hour < 12) hour += 12;
+    if (meridiem.toUpperCase() === 'AM' && hour === 12) hour = 0;
+    let fullYear = parseInt(y, 10);
+    if (fullYear < 100) fullYear += 2000;
+    const minute = parseInt(m, 10);
+    const day = parseInt(d, 10);
+    const month = parseInt(mo, 10);
+    const iso = `${fullYear}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00+05:30`;
+    const t = new Date(iso).getTime();
+    if (!isNaN(t)) return t;
+  }
+
+  const parsed = Date.parse(timeStr);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+/**
  * Fetches unique problems verified and accepted (100 pts) on CodeChef today.
  * Filters strictly for AC / Accepted (100) submissions.
  *
@@ -33,17 +78,22 @@ export async function fetchCodeChefSolved(
     // Strategy 1: Fetch recent submissions list for user
     // CodeChef exposes /recent/user?page=0&user_handle=<handle>
     const recentUrl = `https://www.codechef.com/recent/user?page=0&user_handle=${encodeURIComponent(cleanHandle)}`;
-    const recentRes = await axios.get(recentUrl, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-        Accept: 'application/json, text/javascript, */*; q=0.01',
-        'X-Requested-With': 'XMLHttpRequest',
-      },
-      timeout: 10000,
-    });
+    let recentRes: any = null;
+    try {
+      recentRes = await axios.get(recentUrl, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+          Accept: 'application/json, text/javascript, */*; q=0.01',
+          'X-Requested-With': 'XMLHttpRequest',
+        },
+        timeout: 10000,
+      });
+    } catch (recentErr: any) {
+      console.warn(`CodeChef /recent endpoint failed for "${cleanHandle}":`, recentErr.message);
+    }
 
-    if (recentRes.data?.content) {
+    if (recentRes?.data?.content && recentRes.data.content.includes('<table')) {
       const $ = cheerio.load(recentRes.data.content);
       const nowMs = Date.now();
       const sinceMs = sinceTimestamp * 1000;
@@ -67,38 +117,13 @@ export async function fetchCodeChefSolved(
 
         if (!isAccepted || !problemCode) return;
 
-        // Parse submission time to ensure it occurred today
-        let subMs = 0;
-        if (timeStr.includes('ago')) {
-          // e.g. "5 hours ago", "30 minutes ago", "10 seconds ago"
-          const match = timeStr.match(/(\d+)\s*(sec|min|hour|day)/i);
-          if (match) {
-            const val = parseInt(match[1], 10);
-            const unit = match[2].toLowerCase();
-            const mult =
-              unit.startsWith('sec')
-                ? 1000
-                : unit.startsWith('min')
-                ? 60 * 1000
-                : unit.startsWith('hour')
-                ? 3600 * 1000
-                : 86400 * 1000;
-            subMs = nowMs - val * mult;
-          }
-        } else {
-          // e.g. "10:32 PM 27/10/26"
-          const parsed = Date.parse(timeStr);
-          if (!isNaN(parsed)) subMs = parsed;
-        }
-
+        const subMs = parseCodeChefTime(timeStr, nowMs);
         if (subMs >= sinceMs) {
           uniqueAcceptedProblems.add(problemCode);
         }
       });
-    }
 
-    // Fallback: If recent endpoint found accepted solves, return them
-    if (uniqueAcceptedProblems.size > 0) {
+      // Ground truth obtained directly from verified submissions table
       return {
         platform: 'codechef',
         handle: cleanHandle,
@@ -107,7 +132,7 @@ export async function fetchCodeChefSolved(
       };
     }
 
-    // Strategy 2: Heatmap fallback if recent API fails or table is empty
+    // Strategy 2: Heatmap fallback ONLY if recent API completely failed to respond
     const profileUrl = `https://www.codechef.com/users/${encodeURIComponent(cleanHandle)}`;
     const profileRes = await axios.get(profileUrl, {
       headers: {
@@ -122,10 +147,18 @@ export async function fetchCodeChefSolved(
     if (heatmapMatch) {
       try {
         const stats: Array<{ date: string; value: number }> = JSON.parse(heatmapMatch[1]);
-        const targetDate = new Date(sinceTimestamp * 1000);
-        const year = targetDate.getFullYear();
-        const month = targetDate.getMonth() + 1;
-        const day = targetDate.getDate();
+        
+        // Parse date in Asia/Kolkata (IST) timezone
+        const parts = new Intl.DateTimeFormat('en-CA', {
+          timeZone: 'Asia/Kolkata',
+          year: 'numeric',
+          month: 'numeric',
+          day: 'numeric',
+        }).formatToParts(new Date(sinceTimestamp * 1000));
+
+        const year = parts.find((p) => p.type === 'year')?.value;
+        const month = parts.find((p) => p.type === 'month')?.value;
+        const day = parts.find((p) => p.type === 'day')?.value;
 
         const targetKey = `${year}-${month}-${day}`;
         const targetKeyWithLeadingZeros = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
