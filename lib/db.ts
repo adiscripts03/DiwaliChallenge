@@ -387,25 +387,38 @@ export const db = {
         if (existing) {
           const isSameDay = existing.lastDailyDate === today;
           const currentTotal = existing.totalSolved ?? existing.todaySolved ?? 0;
-          let newTotal = currentTotal;
 
+          // Enforce non-decreasing / monotonic scores:
+          // A user's solve count must NEVER drop on resync due to wrong attempts,
+          // API pagination, or transient external API rate-limits.
+          const safeLc = isSameDay ? Math.max(existing.solvedLc ?? 0, stats.leetcode ?? 0) : (stats.leetcode ?? 0);
+          const safeCf = isSameDay ? Math.max(existing.solvedCf ?? 0, stats.codeforces ?? 0) : (stats.codeforces ?? 0);
+          const safeCc = isSameDay ? Math.max(existing.solvedCc ?? 0, stats.codechef ?? 0) : (stats.codechef ?? 0);
+          const platformSum = safeLc + safeCf + safeCc;
+
+          const safeTodaySolved = isSameDay
+            ? Math.max(existing.todaySolved ?? 0, platformSum, stats.todaySolved ?? 0)
+            : Math.max(platformSum, stats.todaySolved ?? 0);
+
+          let newTotal = currentTotal;
           if (isSameDay) {
-            // Updated earlier today: adjust total by diff in today's solves
-            const diff = stats.todaySolved - existing.todaySolved;
-            newTotal = Math.max(0, currentTotal + diff);
+            // Only add positive delta (never decrease, strictly non-negative delta)
+            const previousToday = existing.todaySolved ?? 0;
+            const increaseInToday = Math.max(0, safeTodaySolved - previousToday);
+            newTotal = Math.max(currentTotal, currentTotal + increaseInToday);
           } else {
-            // First sync of a new day: add today's solves to cumulative total
-            newTotal = currentTotal + stats.todaySolved;
+            // First sync of a new day: add today's verified solves to cumulative total
+            newTotal = Math.max(currentTotal, currentTotal + safeTodaySolved);
           }
 
           const updated = await prisma.user.update({
             where: { id },
             data: {
               totalSolved: newTotal,
-              todaySolved: stats.todaySolved,
-              solvedLc: stats.leetcode,
-              solvedCf: stats.codeforces,
-              solvedCc: stats.codechef,
+              todaySolved: safeTodaySolved,
+              solvedLc: safeLc,
+              solvedCf: safeCf,
+              solvedCc: safeCc,
               lastDailyDate: today,
               lastUpdated: new Date(stats.lastUpdated || Date.now()),
               ...(lastSyncAt ? { lastSyncAt: new Date(lastSyncAt) } : {}),
@@ -445,7 +458,36 @@ export const db = {
     const index = dbData.users.findIndex((u) => u.id === id);
     if (index === -1) return null;
 
-    dbData.users[index].stats = stats;
+    const existingUser = dbData.users[index];
+    const isSameDay = existingUser.lastDailyDate === today;
+    const currentTotal = existingUser.stats?.totalSolved ?? existingUser.stats?.todaySolved ?? 0;
+
+    const safeLc = isSameDay ? Math.max(existingUser.stats?.leetcode ?? 0, stats.leetcode ?? 0) : (stats.leetcode ?? 0);
+    const safeCf = isSameDay ? Math.max(existingUser.stats?.codeforces ?? 0, stats.codeforces ?? 0) : (stats.codeforces ?? 0);
+    const safeCc = isSameDay ? Math.max(existingUser.stats?.codechef ?? 0, stats.codechef ?? 0) : (stats.codechef ?? 0);
+    const platformSum = safeLc + safeCf + safeCc;
+
+    const safeTodaySolved = isSameDay
+      ? Math.max(existingUser.stats?.todaySolved ?? 0, platformSum, stats.todaySolved ?? 0)
+      : Math.max(platformSum, stats.todaySolved ?? 0);
+
+    let newTotal = currentTotal;
+    if (isSameDay) {
+      const previousToday = existingUser.stats?.todaySolved ?? 0;
+      const increaseInToday = Math.max(0, safeTodaySolved - previousToday);
+      newTotal = Math.max(currentTotal, currentTotal + increaseInToday);
+    } else {
+      newTotal = Math.max(currentTotal, currentTotal + safeTodaySolved);
+    }
+
+    dbData.users[index].stats = {
+      totalSolved: newTotal,
+      todaySolved: safeTodaySolved,
+      leetcode: safeLc,
+      codeforces: safeCf,
+      codechef: safeCc,
+      lastUpdated: stats.lastUpdated || new Date().toISOString(),
+    };
     dbData.users[index].lastDailyDate = today;
     if (lastSyncAt) {
       dbData.users[index].lastSyncAt = lastSyncAt;

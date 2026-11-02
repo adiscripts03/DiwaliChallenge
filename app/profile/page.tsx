@@ -84,6 +84,7 @@ export default function ProfilePage() {
       if (!res.ok) throw new Error(data.error || 'Failed to update profile');
 
       setUser(data.user);
+      router.refresh();
       setMessage({ type: 'success', text: 'Handles saved successfully!' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
@@ -123,12 +124,30 @@ export default function ProfilePage() {
       // Start 300-second (5 minute) cooldown timer upon successful sync
       setCooldownSeconds(300);
 
-      // Refresh current user data
-      const meRes = await fetch('/api/auth/me');
-      const meData = await meRes.json();
-      if (meData.user) {
-        setUser(meData.user);
+      // Immediately update local UI state with the fresh synced stats
+      if (data.userSync?.stats) {
+        setUser((prev) =>
+          prev
+            ? {
+                ...prev,
+                stats: data.userSync.stats,
+              }
+            : prev
+        );
       }
+
+      // Also refresh full user state in background without browser caching
+      try {
+        const meRes = await fetch('/api/auth/me', { cache: 'no-store' });
+        const meData = await meRes.json();
+        if (meData?.user) {
+          setUser(meData.user);
+        }
+      } catch (err) {
+        console.warn('Silent refresh error:', err);
+      }
+
+      router.refresh();
 
       setMessage({
         type: 'success',

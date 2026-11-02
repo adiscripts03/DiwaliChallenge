@@ -55,8 +55,13 @@ export async function syncUserSolves(user: User): Promise<UserSyncResult> {
     todayDateStr
   );
 
-  if (updatedUser?.stats?.totalSolved !== undefined) {
+  if (updatedUser?.stats) {
     newStats.totalSolved = updatedUser.stats.totalSolved;
+    newStats.todaySolved = updatedUser.stats.todaySolved;
+    newStats.leetcode = updatedUser.stats.leetcode;
+    newStats.codeforces = updatedUser.stats.codeforces;
+    newStats.codechef = updatedUser.stats.codechef;
+    newStats.lastUpdated = updatedUser.stats.lastUpdated;
   }
 
   return {

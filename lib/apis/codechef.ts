@@ -74,56 +74,80 @@ export async function fetchCodeChefSolved(
 
   try {
     const uniqueAcceptedProblems = new Set<string>();
+    const nowMs = Date.now();
+    const sinceMs = sinceTimestamp * 1000;
+    let recentApiSucceeded = false;
 
-    // Strategy 1: Fetch recent submissions list for user
-    // CodeChef exposes /recent/user?page=0&user_handle=<handle>
-    const recentUrl = `https://www.codechef.com/recent/user?page=0&user_handle=${encodeURIComponent(cleanHandle)}`;
-    let recentRes: any = null;
-    try {
-      recentRes = await axios.get(recentUrl, {
-        headers: {
-          'User-Agent':
-            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-          Accept: 'application/json, text/javascript, */*; q=0.01',
-          'X-Requested-With': 'XMLHttpRequest',
-        },
-        timeout: 10000,
-      });
-    } catch (recentErr: any) {
-      console.warn(`CodeChef /recent endpoint failed for "${cleanHandle}":`, recentErr.message);
+    // Strategy 1: Fetch recent submissions across multiple pages (up to 4 pages = ~60 submissions)
+    // CodeChef exposes /recent/user?page=X&user_handle=<handle>
+    // Submissions are chronologically descending (newest first).
+    for (let page = 0; page <= 4; page++) {
+      const recentUrl = `https://www.codechef.com/recent/user?page=${page}&user_handle=${encodeURIComponent(cleanHandle)}`;
+      let recentRes: any = null;
+      try {
+        recentRes = await axios.get(recentUrl, {
+          headers: {
+            'User-Agent':
+              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+            Accept: 'application/json, text/javascript, */*; q=0.01',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+          timeout: 10000,
+        });
+      } catch (recentErr: any) {
+        if (page === 0) {
+          console.warn(`CodeChef /recent endpoint failed for "${cleanHandle}":`, recentErr.message);
+        }
+        break;
+      }
+
+      if (recentRes?.data?.content && recentRes.data.content.includes('<table')) {
+        recentApiSucceeded = true;
+        const $ = cheerio.load(recentRes.data.content);
+        let validRowsOnPage = 0;
+        let pageHasOlderThanToday = false;
+
+        $('tr').each((idx, row) => {
+          if (idx === 0) return; // skip header
+          const tds = $(row).find('td');
+          if (tds.length < 3) return;
+
+          validRowsOnPage++;
+          const timeStr = $(tds[0]).text().trim();
+          const problemLink = $(tds[1]).find('a').first();
+          const problemCode = (problemLink.text() || $(tds[1]).text()).trim();
+
+          // Check if accepted: result contains '(100)' or status icon is tick-icon / accepted
+          const resultSpan = $(tds[2]).find('span[title]').first().attr('title') || '';
+          const resultText = $(tds[2]).text().trim();
+          const isAccepted =
+            resultSpan.toLowerCase() === 'accepted' ||
+            resultText.includes('(100)') ||
+            $(tds[2]).find('img[src*="tick"]').length > 0;
+
+          if (!problemCode) return;
+
+          const subMs = parseCodeChefTime(timeStr, nowMs);
+          if (subMs > 0 && subMs < sinceMs) {
+            pageHasOlderThanToday = true;
+          }
+
+          if (isAccepted && subMs >= sinceMs) {
+            uniqueAcceptedProblems.add(problemCode);
+          }
+        });
+
+        // If no rows were found on this page, or submissions have gone past today's start, stop fetching further pages
+        if (validRowsOnPage === 0 || pageHasOlderThanToday) {
+          break;
+        }
+      } else {
+        break;
+      }
     }
 
-    if (recentRes?.data?.content && recentRes.data.content.includes('<table')) {
-      const $ = cheerio.load(recentRes.data.content);
-      const nowMs = Date.now();
-      const sinceMs = sinceTimestamp * 1000;
-
-      $('tr').each((idx, row) => {
-        if (idx === 0) return; // skip header
-        const tds = $(row).find('td');
-        if (tds.length < 3) return;
-
-        const timeStr = $(tds[0]).text().trim();
-        const problemLink = $(tds[1]).find('a').first();
-        const problemCode = (problemLink.text() || $(tds[1]).text()).trim();
-
-        // Check if accepted: result contains '(100)' or status icon is tick-icon / accepted
-        const resultSpan = $(tds[2]).find('span[title]').first().attr('title') || '';
-        const resultText = $(tds[2]).text().trim();
-        const isAccepted =
-          resultSpan.toLowerCase() === 'accepted' ||
-          resultText.includes('(100)') ||
-          $(tds[2]).find('img[src*="tick"]').length > 0;
-
-        if (!isAccepted || !problemCode) return;
-
-        const subMs = parseCodeChefTime(timeStr, nowMs);
-        if (subMs >= sinceMs) {
-          uniqueAcceptedProblems.add(problemCode);
-        }
-      });
-
-      // Ground truth obtained directly from verified submissions table
+    if (recentApiSucceeded) {
+      // Ground truth obtained directly from verified submissions table across pages
       return {
         platform: 'codechef',
         handle: cleanHandle,
