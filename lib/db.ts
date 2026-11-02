@@ -34,6 +34,11 @@ export interface User {
 interface DatabaseSchema {
   users: User[];
   lastGlobalSync?: string;
+  views?: {
+    total: number;
+    today: number;
+    date: string;
+  };
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -481,5 +486,107 @@ export const db = {
 
     const dbData = ensureDbFile();
     return dbData.lastGlobalSync;
+  },
+
+  async recordPageView(): Promise<{ totalViews: number; todayViews: number }> {
+    const today = getTodayDateString();
+    if (hasPostgresUrl()) {
+      try {
+        const rows = await prisma.globalMeta.findMany({
+          where: { key: { in: ['views_total', 'views_today', 'views_today_date'] } },
+        });
+
+        let total = 0;
+        let todayCount = 0;
+        let recordedDate = '';
+
+        for (const row of rows) {
+          if (row.key === 'views_total') total = parseInt(row.value, 10) || 0;
+          if (row.key === 'views_today') todayCount = parseInt(row.value, 10) || 0;
+          if (row.key === 'views_today_date') recordedDate = row.value;
+        }
+
+        total += 1;
+        if (recordedDate === today) {
+          todayCount += 1;
+        } else {
+          todayCount = 1;
+          recordedDate = today;
+        }
+
+        await prisma.$transaction([
+          prisma.globalMeta.upsert({
+            where: { key: 'views_total' },
+            create: { key: 'views_total', value: String(total) },
+            update: { value: String(total) },
+          }),
+          prisma.globalMeta.upsert({
+            where: { key: 'views_today' },
+            create: { key: 'views_today', value: String(todayCount) },
+            update: { value: String(todayCount) },
+          }),
+          prisma.globalMeta.upsert({
+            where: { key: 'views_today_date' },
+            create: { key: 'views_today_date', value: recordedDate },
+            update: { value: recordedDate },
+          }),
+        ]);
+
+        return { totalViews: total, todayViews: todayCount };
+      } catch (err: any) {
+        console.warn('Prisma recordPageView error:', err.message);
+      }
+    }
+
+    const dbData = ensureDbFile();
+    if (!dbData.views) {
+      dbData.views = { total: 0, today: 0, date: today };
+    }
+    dbData.views.total += 1;
+    if (dbData.views.date === today) {
+      dbData.views.today += 1;
+    } else {
+      dbData.views.today = 1;
+      dbData.views.date = today;
+    }
+    saveDb(dbData);
+    return { totalViews: dbData.views.total, todayViews: dbData.views.today };
+  },
+
+  async getPageViews(): Promise<{ totalViews: number; todayViews: number }> {
+    const today = getTodayDateString();
+    if (hasPostgresUrl()) {
+      try {
+        const rows = await prisma.globalMeta.findMany({
+          where: { key: { in: ['views_total', 'views_today', 'views_today_date'] } },
+        });
+
+        let total = 0;
+        let todayCount = 0;
+        let recordedDate = '';
+
+        for (const row of rows) {
+          if (row.key === 'views_total') total = parseInt(row.value, 10) || 0;
+          if (row.key === 'views_today') todayCount = parseInt(row.value, 10) || 0;
+          if (row.key === 'views_today_date') recordedDate = row.value;
+        }
+
+        return {
+          totalViews: total,
+          todayViews: recordedDate === today ? todayCount : 0,
+        };
+      } catch (err: any) {
+        console.warn('Prisma getPageViews error:', err.message);
+      }
+    }
+
+    const dbData = ensureDbFile();
+    if (!dbData.views) {
+      return { totalViews: 0, todayViews: 0 };
+    }
+    return {
+      totalViews: dbData.views.total,
+      todayViews: dbData.views.date === today ? dbData.views.today : 0,
+    };
   },
 };
