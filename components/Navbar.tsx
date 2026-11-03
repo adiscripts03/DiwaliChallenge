@@ -3,13 +3,14 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Trophy, LogOut, LogIn, UserPlus } from 'lucide-react';
+import { Trophy, LogOut, LogIn, UserPlus, Shield } from 'lucide-react';
 import GDGLogo from '@/components/GDGLogo';
 
 interface AuthUser {
   id: string;
   name: string;
   email: string;
+  role?: string;
 }
 
 export default function Navbar() {
@@ -73,6 +74,20 @@ export default function Navbar() {
             <>
               {user ? (
                 <div className="flex items-center space-x-3">
+                  {user.role === 'admin' && (
+                    <Link
+                      href="/admin"
+                      className={`flex items-center space-x-1.5 text-xs font-bold px-2.5 py-1.5 rounded-lg border transition-all ${
+                        pathname === '/admin'
+                          ? 'border-amber-400 bg-amber-400/20 text-amber-300'
+                          : 'border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20'
+                      }`}
+                    >
+                      <Shield className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Admin</span>
+                    </Link>
+                  )}
+
                   <Link
                     href="/profile"
                     className={`flex items-center space-x-2 text-sm font-medium px-3 py-1.5 rounded-lg border transition-all ${

@@ -31,6 +31,23 @@ export interface User {
   createdAt: string;
 }
 
+export interface AdminUserOverwriteInput {
+  name?: string;
+  handles?: {
+    leetcode?: string;
+    codeforces?: string;
+    codechef?: string;
+  };
+  stats?: {
+    totalSolved?: number;
+    todaySolved?: number;
+    leetcode?: number;
+    codeforces?: number;
+    codechef?: number;
+  };
+  resetCooldown?: boolean;
+}
+
 interface DatabaseSchema {
   users: User[];
   lastGlobalSync?: string;
@@ -369,6 +386,90 @@ export const db = {
         ...(updates.handles || {}),
       },
     };
+
+    saveDb(dbData);
+    return dbData.users[index];
+  },
+
+  async adminOverwriteUser(id: string, updates: AdminUserOverwriteInput): Promise<User | null> {
+    const today = getTodayDateString();
+    if (hasPostgresUrl()) {
+      try {
+        const existing = await prisma.user.findUnique({ where: { id } });
+        if (!existing) return null;
+
+        const updated = await prisma.user.update({
+          where: { id },
+          data: {
+            ...(updates.name ? { name: updates.name.trim() } : {}),
+            ...(updates.handles?.leetcode !== undefined ? { leetcode: updates.handles.leetcode.trim() } : {}),
+            ...(updates.handles?.codeforces !== undefined ? { codeforces: updates.handles.codeforces.trim() } : {}),
+            ...(updates.handles?.codechef !== undefined ? { codechef: updates.handles.codechef.trim() } : {}),
+            ...(updates.stats?.totalSolved !== undefined ? { totalSolved: updates.stats.totalSolved } : {}),
+            ...(updates.stats?.todaySolved !== undefined ? { todaySolved: updates.stats.todaySolved } : {}),
+            ...(updates.stats?.leetcode !== undefined ? { solvedLc: updates.stats.leetcode } : {}),
+            ...(updates.stats?.codeforces !== undefined ? { solvedCf: updates.stats.codeforces } : {}),
+            ...(updates.stats?.codechef !== undefined ? { solvedCc: updates.stats.codechef } : {}),
+            ...(updates.resetCooldown ? { lastSyncAt: null } : {}),
+            lastDailyDate: today,
+            lastUpdated: new Date(),
+          },
+        });
+
+        return {
+          id: updated.id,
+          name: updated.name,
+          email: updated.email,
+          passwordHash: updated.passwordHash,
+          role: updated.role as 'user' | 'admin',
+          handles: {
+            leetcode: updated.leetcode,
+            codeforces: updated.codeforces,
+            codechef: updated.codechef,
+          },
+          stats: {
+            totalSolved: updated.totalSolved,
+            todaySolved: updated.todaySolved,
+            leetcode: updated.solvedLc,
+            codeforces: updated.solvedCf,
+            codechef: updated.solvedCc,
+            lastUpdated: updated.lastUpdated.toISOString(),
+          },
+          lastDailyDate: updated.lastDailyDate,
+          lastSyncAt: updated.lastSyncAt ? updated.lastSyncAt.toISOString() : undefined,
+          createdAt: updated.createdAt.toISOString(),
+        };
+      } catch (err: any) {
+        console.warn('Prisma adminOverwriteUser error:', err.message);
+      }
+    }
+
+    const dbData = ensureDbFile();
+    const index = dbData.users.findIndex((u) => u.id === id);
+    if (index === -1) return null;
+
+    if (updates.name) dbData.users[index].name = updates.name.trim();
+    if (updates.handles) {
+      dbData.users[index].handles = {
+        ...dbData.users[index].handles,
+        ...updates.handles,
+      };
+    }
+    if (updates.stats) {
+      dbData.users[index].stats = {
+        ...dbData.users[index].stats,
+        ...(updates.stats.totalSolved !== undefined ? { totalSolved: updates.stats.totalSolved } : {}),
+        ...(updates.stats.todaySolved !== undefined ? { todaySolved: updates.stats.todaySolved } : {}),
+        ...(updates.stats.leetcode !== undefined ? { leetcode: updates.stats.leetcode } : {}),
+        ...(updates.stats.codeforces !== undefined ? { codeforces: updates.stats.codeforces } : {}),
+        ...(updates.stats.codechef !== undefined ? { codechef: updates.stats.codechef } : {}),
+        lastUpdated: new Date().toISOString(),
+      };
+    }
+    if (updates.resetCooldown) {
+      delete dbData.users[index].lastSyncAt;
+    }
+    dbData.users[index].lastDailyDate = today;
 
     saveDb(dbData);
     return dbData.users[index];
