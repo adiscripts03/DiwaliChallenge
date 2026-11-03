@@ -99,14 +99,37 @@ export default function ProfilePage() {
     setMessage(null);
 
     try {
-      // First save if any pending edits
-      await fetch('/api/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, leetcode, codeforces, codechef }),
-      });
+      const hasPendingEdits =
+        name.trim() !== (user.name || '').trim() ||
+        leetcode.trim() !== (user.handles?.leetcode || '').trim() ||
+        codeforces.trim() !== (user.handles?.codeforces || '').trim() ||
+        codechef.trim() !== (user.handles?.codechef || '').trim();
 
-      // Now sync this user
+      if (hasPendingEdits) {
+        // If user edited their handles in the input fields, save profile (which also syncs solves)
+        const profileRes = await fetch('/api/profile', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, leetcode, codeforces, codechef }),
+        });
+
+        const profileData = await profileRes.json();
+        if (!profileRes.ok) {
+          throw new Error(profileData.error || 'Failed to update profile');
+        }
+
+        setCooldownSeconds(300);
+        if (profileData?.user) {
+          setUser(profileData.user);
+        }
+        setMessage({
+          type: 'success',
+          text: `Profile saved & synced! Solved today: ${profileData.user?.stats?.todaySolved ?? 0} (Global Total: ${profileData.user?.stats?.totalSolved ?? 0}).`,
+        });
+        return;
+      }
+
+      // Normal sync: directly fetch solves across connected platforms
       const res = await fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -124,30 +147,24 @@ export default function ProfilePage() {
       // Start 300-second (5 minute) cooldown timer upon successful sync
       setCooldownSeconds(300);
 
-      // Immediately update local UI state with the fresh synced stats
+      // Immediately update local UI cards with the fresh synced stats
       if (data.userSync?.stats) {
-        setUser((prev) =>
-          prev
-            ? {
-                ...prev,
-                stats: data.userSync.stats,
-              }
-            : prev
-        );
+        setUser((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            stats: {
+              ...prev.stats,
+              totalSolved: data.userSync.stats.totalSolved ?? prev.stats.totalSolved,
+              todaySolved: data.userSync.stats.todaySolved ?? prev.stats.todaySolved,
+              leetcode: data.userSync.stats.leetcode ?? prev.stats.leetcode,
+              codeforces: data.userSync.stats.codeforces ?? prev.stats.codeforces,
+              codechef: data.userSync.stats.codechef ?? prev.stats.codechef,
+              lastUpdated: data.userSync.stats.lastUpdated || new Date().toISOString(),
+            },
+          };
+        });
       }
-
-      // Also refresh full user state in background without browser caching
-      try {
-        const meRes = await fetch('/api/auth/me', { cache: 'no-store' });
-        const meData = await meRes.json();
-        if (meData?.user) {
-          setUser(meData.user);
-        }
-      } catch (err) {
-        console.warn('Silent refresh error:', err);
-      }
-
-      router.refresh();
 
       setMessage({
         type: 'success',
