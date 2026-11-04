@@ -5,6 +5,8 @@ import Navbar from '@/components/Navbar';
 import DailySyncReminderBanner from '@/components/DailySyncReminderBanner';
 import DiyaBackground from '@/components/DiyaBackground';
 import FooterViewCounter from '@/components/FooterViewCounter';
+import DiwaliGreetingAnimation from '@/components/DiwaliGreetingAnimation';
+import DiwaliReplayButton from '@/components/DiwaliReplayButton';
 
 export const metadata: Metadata = {
   title: 'GDG Diwali Challenge | Competitive Programming Leaderboard',
@@ -20,6 +22,7 @@ export default function RootLayout({
     <html lang="en">
       <body className="bg-[#0d0a07] text-[#fef3c7] min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200 relative overflow-x-hidden">
         <DiyaBackground />
+        <DiwaliGreetingAnimation />
         <div className="relative z-10 flex flex-col min-h-screen">
           <Navbar />
           <DailySyncReminderBanner />
@@ -28,6 +31,7 @@ export default function RootLayout({
           </main>
           <footer className="border-t border-slate-800/80 py-8 text-center text-xs text-slate-400">
             <div className="flex flex-col items-center justify-center gap-3">
+              <DiwaliReplayButton />
               <FooterViewCounter />
               <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-slate-400">
                 <span>© {new Date().getFullYear()} GDG Diwali Challenge.</span>

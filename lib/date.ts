@@ -6,7 +6,12 @@
 export const CHALLENGE_TIMEZONE = process.env.NEXT_PUBLIC_TIMEZONE || 'Asia/Kolkata';
 
 /**
- * Returns today's date string (e.g. "2026-11-02") in the target timezone (Asia/Kolkata).
+ * Official Diwali Day in the 2026 challenge: November 8, 2026 (Asia/Kolkata).
+ */
+export const DIWALI_DATE_STRING = '2026-11-08';
+
+/**
+ * Returns today's date string (e.g. "2026-11-08") in the target timezone (Asia/Kolkata).
  */
 export function getTodayDateString(timeZone: string = CHALLENGE_TIMEZONE): string {
   try {
@@ -21,6 +26,13 @@ export function getTodayDateString(timeZone: string = CHALLENGE_TIMEZONE): strin
   } catch {
     return new Date().toISOString().split('T')[0];
   }
+}
+
+/**
+ * Checks whether the current date in IST (Asia/Kolkata) is Diwali Day (2026-11-08).
+ */
+export function isDiwaliDay(timeZone: string = CHALLENGE_TIMEZONE): boolean {
+  return getTodayDateString(timeZone) === DIWALI_DATE_STRING;
 }
 
 /**
