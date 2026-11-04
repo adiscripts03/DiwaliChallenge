@@ -23,10 +23,11 @@ export default function DeveloperPage() {
             <div className="absolute -inset-2.5 bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-300 rounded-3xl blur-lg opacity-75 group-hover:opacity-100 transition duration-500" />
             <div className="relative w-60 h-72 sm:w-72 sm:h-88 md:w-80 md:h-[420px] rounded-3xl overflow-hidden border-2 border-amber-400/60 shadow-2xl bg-slate-900">
               <Image
-                src="/images/aditya.jpg"
+                src="/images/aditya.webp"
                 alt="Aditya Singh"
                 fill
                 priority
+                unoptimized
                 sizes="(max-width: 768px) 240px, 320px"
                 className="object-cover object-center group-hover:scale-105 transition duration-500"
               />

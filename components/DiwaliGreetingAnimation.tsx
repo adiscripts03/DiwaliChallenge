@@ -77,6 +77,12 @@ export default function DiwaliGreetingAnimation() {
   useEffect(() => {
     setMounted(true);
 
+    // Instant browser prefetch into memory cache
+    if (typeof window !== 'undefined') {
+      const img = new window.Image();
+      img.src = '/images/lakshmi_ganesha_diwali.webp';
+    }
+
     // Check if it's Diwali Day (November 8, 2026 IST) or forced via query param
     const checkShouldOpen = () => {
       if (typeof window === 'undefined') return;
@@ -228,10 +234,11 @@ export default function DiwaliGreetingAnimation() {
         {/* Sacred Artwork of Lakshmi Ji & Ganesha Ji */}
         <div className="relative group w-full max-w-[260px] xs:max-w-[320px] sm:max-w-lg aspect-[16/9] rounded-xl sm:rounded-2xl overflow-hidden border border-amber-500/40 shadow-[0_0_35px_rgba(245,158,11,0.35)] transition-transform duration-700">
           <Image
-            src="/images/lakshmi_ganesha_diwali.jpg"
+            src="/images/lakshmi_ganesha_diwali.webp"
             alt="Divine Goddess Lakshmi and Lord Ganesha - Happy Diwali"
             fill
             priority
+            unoptimized
             sizes="(max-width: 640px) 320px, 512px"
             className="object-cover object-center"
           />
