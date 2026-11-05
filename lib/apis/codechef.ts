@@ -87,8 +87,8 @@ async function filterCodeChefProblemsByMinRating(
   const verified: string[] = [];
   let cacheModified = false;
 
-  // Process in small parallel chunks to maximize speed without tripping rate limits
-  const chunkSize = 6;
+  // Process in parallel chunks to maximize speed without tripping rate limits
+  const chunkSize = 15;
   for (let i = 0; i < problemCodes.length; i += chunkSize) {
     const chunk = problemCodes.slice(i, i + chunkSize);
     await Promise.all(
