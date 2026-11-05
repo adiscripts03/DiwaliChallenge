@@ -98,7 +98,7 @@ export default function DailySyncReminderBanner() {
           : 'bg-gradient-to-r from-amber-950/80 via-[#1c130b]/90 to-amber-950/80 border-amber-500/30 text-amber-100'
       } backdrop-blur-md px-4 sm:px-6 py-2.5 shadow-lg`}
     >
-      <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
+      <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">
         {/* Left: Message & Day Indicator */}
         <div className="flex items-center space-x-3 text-center md:text-left">
           <div

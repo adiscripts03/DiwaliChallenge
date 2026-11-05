@@ -78,7 +78,7 @@ export default function DailySyncWidget() {
           <h3 className="text-lg sm:text-xl font-black text-white">
             Daily Progress Tracking Notice
           </h3>
-          <p className="text-xs sm:text-sm text-amber-100/70 max-w-xl">
+          <p className="text-xs sm:text-sm text-amber-100/70 max-w-3xl">
             Manually sync all solved questions on the website every night before going to sleep. Only synced questions will count towards the leaderboard — unsynced questions will <span className="text-amber-400 font-bold underline">not</span> be considered!
           </p>
         </div>

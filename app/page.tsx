@@ -63,7 +63,7 @@ export default function HomePage() {
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white text-balance">
               GDG Diwali <span className="text-amber-400">Challenge</span>
             </h1>
-            <p className="mt-2 text-amber-100/80 text-sm sm:text-base max-w-xl text-pretty">
+            <p className="mt-2 text-amber-100/80 text-sm sm:text-base max-w-3xl text-pretty">
               Vacation long coding sprint for freshers! Tracking all verified problems solved during the Diwali vacation. Top 3 coders at the end of vacation will be awarded!
             </p>
           </div>

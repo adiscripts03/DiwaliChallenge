@@ -189,7 +189,7 @@ export default function ProfilePage() {
   if (!user) return null;
 
   return (
-    <div className="max-w-6xl w-full mx-auto space-y-8">
+    <div className="w-full mx-auto space-y-8">
       {/* Header card */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-10 backdrop-blur-md shadow-2xl">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 pb-8 border-b border-slate-800">

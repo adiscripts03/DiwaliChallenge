@@ -12,7 +12,7 @@ export default function DeveloperPage() {
   return (
     <div className="w-full flex-1 flex flex-col justify-center min-h-[calc(100vh-14rem)] py-2 sm:py-6">
       {/* Full-Page Hero Card */}
-      <div className="w-full max-w-6xl mx-auto flex-1 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/95 via-[#140e09]/95 to-[#0d0a07]/95 border border-amber-900/40 p-8 sm:p-14 lg:p-16 shadow-2xl backdrop-blur-md">
+      <div className="w-full mx-auto flex-1 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/95 via-[#140e09]/95 to-[#0d0a07]/95 border border-amber-900/40 p-8 sm:p-14 lg:p-16 shadow-2xl backdrop-blur-md">
         {/* Ambient warm glows */}
         <div className="absolute top-0 right-0 -translate-y-16 translate-x-16 w-[500px] h-[500px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 translate-y-16 -translate-x-16 w-[500px] h-[500px] bg-orange-600/15 rounded-full blur-3xl pointer-events-none" />

@@ -65,7 +65,7 @@ export default function Podium({ topThree }: PodiumProps) {
 
   return (
     <div className="w-full my-8">
-      <div className="grid grid-cols-1 md:grid-cols-3 items-end gap-6 sm:gap-8 max-w-6xl w-full mx-auto pt-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 items-end gap-6 sm:gap-8 w-full mx-auto pt-6">
         {/* 2nd Place */}
         {second ? (
           <div className="order-2 md:order-1 flex flex-col items-center w-full">
