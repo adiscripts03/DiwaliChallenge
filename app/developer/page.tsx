@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { Github, Linkedin, Sparkles, Flame } from 'lucide-react';
 
 export const metadata = {
-  title: 'Website Team (Lone Wolf) | GDG Diwali Challenge',
-  description: 'Meet the entire website team — all one of him.',
+  title: 'Meet the Man Behind | GDG Diwali Challenge',
+  description: 'Meet the solo developer behind the GDG Diwali Challenge platform.',
 };
 
 export default function DeveloperPage() {

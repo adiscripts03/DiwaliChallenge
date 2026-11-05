@@ -53,7 +53,7 @@ export default function RootLayout({
                   href="/developer"
                   className="font-medium text-amber-400/90 hover:text-amber-300 underline decoration-dotted transition-colors"
                 >
-                  Made with love by Website Team (Lone wolf btw)
+                  Meet the Man Behind
                 </Link>
               </div>
             </div>
