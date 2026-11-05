@@ -78,24 +78,26 @@ export default function HomePage() {
         </div>
 
         {/* Live Metrics Row */}
-        <div className="grid grid-cols-2 gap-4 mt-8 pt-6 border-t border-slate-800/80">
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
-              <Flame className="w-5 h-5" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mt-8 pt-6 border-t border-amber-900/40">
+          <div className="flex items-center space-x-4 p-4 sm:p-5 rounded-2xl bg-black/40 border border-amber-500/20 shadow-lg">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
+              <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-amber-500" />
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-black text-white">{totalSolvedChallenge}</div>
-              <div className="text-xs text-slate-400">Total Solved in Challenge</div>
+              <div className="text-2xl sm:text-4xl font-black text-white tracking-tight">{totalSolvedChallenge}</div>
+              <div className="text-xs sm:text-sm text-amber-200/80 font-medium">Total Solved in Challenge</div>
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-400">
-              <Users className="w-5 h-5" />
+          <div className="flex items-center space-x-4 p-4 sm:p-5 rounded-2xl bg-black/40 border border-orange-500/20 shadow-lg">
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-orange-500/15 border border-orange-500/30 flex items-center justify-center text-orange-400 shrink-0 shadow-inner">
+              <Users className="w-6 h-6 sm:w-7 sm:h-7 text-orange-400" />
             </div>
             <div>
-              <div className="text-xl sm:text-2xl font-black text-white">{activeSolvers} / {users.length}</div>
-              <div className="text-xs text-slate-400">Active Competitors</div>
+              <div className="text-2xl sm:text-4xl font-black text-white tracking-tight">
+                {activeSolvers} <span className="text-lg sm:text-2xl text-slate-400 font-bold">/ {users.length}</span>
+              </div>
+              <div className="text-xs sm:text-sm text-orange-200/80 font-medium">Active Competitors</div>
             </div>
           </div>
         </div>
