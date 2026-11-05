@@ -77,28 +77,58 @@ export async function fetchCodeChefSolved(
     const nowMs = Date.now();
     const sinceMs = sinceTimestamp * 1000;
     let recentApiSucceeded = false;
+    const profileUrl = `https://www.codechef.com/users/${encodeURIComponent(cleanHandle)}`;
 
-    // Strategy 1: Fetch recent submissions across multiple pages (up to 4 pages = ~60 submissions)
+    // Prime session cookies by loading profile first (bypasses Cloudflare / Drupal 429 WAF)
+    let sessionCookies = '';
+    try {
+      const initProfileRes = await axios.get(profileUrl, {
+        headers: {
+          'User-Agent':
+            'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+          Accept: 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        },
+        timeout: 10000,
+      });
+      sessionCookies = initProfileRes.headers['set-cookie']?.map((c: string) => c.split(';')[0]).join('; ') || '';
+    } catch {
+      // Continue even if profile priming had an error
+    }
+
+    // Strategy 1: Fetch recent submissions across multiple pages (up to 20 pages = ~260 submissions)
     // CodeChef exposes /recent/user?page=X&user_handle=<handle>
     // Submissions are chronologically descending (newest first).
-    for (let page = 0; page <= 4; page++) {
+    const maxPages = 20;
+    for (let page = 0; page < maxPages; page++) {
       const recentUrl = `https://www.codechef.com/recent/user?page=${page}&user_handle=${encodeURIComponent(cleanHandle)}`;
       let recentRes: any = null;
-      try {
-        recentRes = await axios.get(recentUrl, {
-          headers: {
-            'User-Agent':
-              'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-            Accept: 'application/json, text/javascript, */*; q=0.01',
-            'X-Requested-With': 'XMLHttpRequest',
-          },
-          timeout: 10000,
-        });
-      } catch (recentErr: any) {
-        if (page === 0) {
-          console.warn(`CodeChef /recent endpoint failed for "${cleanHandle}":`, recentErr.message);
+
+      // Retry mechanism on 429 (Too Many Requests) with backoff
+      for (let attempt = 1; attempt <= 4; attempt++) {
+        try {
+          recentRes = await axios.get(recentUrl, {
+            headers: {
+              'User-Agent':
+                'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+              Accept: 'application/json, text/javascript, */*; q=0.01',
+              'X-Requested-With': 'XMLHttpRequest',
+              Referer: profileUrl,
+              ...(sessionCookies ? { Cookie: sessionCookies } : {}),
+            },
+            timeout: 12000,
+          });
+          break;
+        } catch (recentErr: any) {
+          if (recentErr.response?.status === 429 && attempt < 4) {
+            const backoffMs = attempt * 1800;
+            await new Promise((r) => setTimeout(r, backoffMs));
+          } else {
+            if (page === 0) {
+              console.warn(`CodeChef /recent endpoint failed for "${cleanHandle}":`, recentErr.message);
+            }
+            break;
+          }
         }
-        break;
       }
 
       if (recentRes?.data?.content && recentRes.data.content.includes('<table')) {
@@ -141,6 +171,9 @@ export async function fetchCodeChefSolved(
         if (validRowsOnPage === 0 || pageHasOlderThanToday) {
           break;
         }
+
+        // Polite pacing to avoid triggering Cloudflare 429 rate limit
+        await new Promise((r) => setTimeout(r, 600));
       } else {
         break;
       }
@@ -157,7 +190,6 @@ export async function fetchCodeChefSolved(
     }
 
     // Strategy 2: Heatmap fallback ONLY if recent API completely failed to respond
-    const profileUrl = `https://www.codechef.com/users/${encodeURIComponent(cleanHandle)}`;
     const profileRes = await axios.get(profileUrl, {
       headers: {
         'User-Agent':
