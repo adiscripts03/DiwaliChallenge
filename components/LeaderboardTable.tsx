@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { RefreshCw, Search, ExternalLink, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, Search, ExternalLink, CheckCircle2, Flame, Trophy, Medal } from 'lucide-react';
 import PlatformBadge from './PlatformBadge';
 
 export interface LeaderboardUser {
@@ -58,29 +58,29 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
   const maxSolved = Math.max(...users.map((u) => u.stats?.totalSolved ?? u.stats?.todaySolved ?? 0), 5);
 
   return (
-    <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl shadow-xl overflow-hidden backdrop-blur-sm">
+    <div className="w-full bg-slate-900/70 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden backdrop-blur-md">
       {/* Search & Filter Toolbar */}
-      <div className="p-4 sm:p-5 border-b border-slate-800/80 flex flex-col sm:flex-row gap-3 items-center justify-between">
-        <div className="relative w-full sm:w-72">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+      <div className="p-5 sm:p-7 border-b border-slate-800/80 flex flex-col md:flex-row gap-4 items-stretch md:items-center justify-between">
+        <div className="relative w-full md:w-96">
+          <Search className="w-5 h-5 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
             placeholder="Search coder or platform handle..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-950/80 border border-slate-700/80 rounded-xl pl-9 pr-4 py-2 text-sm text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition-all"
+            className="w-full bg-slate-950/90 border border-slate-700/80 rounded-2xl pl-11 pr-4 py-3 text-sm sm:text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-400/40 focus:border-amber-400 transition-all shadow-inner"
           />
         </div>
 
         {/* Platform filter tabs */}
-        <div className="flex items-center space-x-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800 self-stretch sm:self-auto overflow-x-auto">
+        <div className="flex items-center space-x-2 p-1.5 bg-slate-950/90 rounded-2xl border border-slate-800 self-stretch md:self-auto overflow-x-auto shadow-inner">
           {(['all', 'leetcode', 'codeforces', 'codechef'] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setFilterPlatform(tab)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold capitalize whitespace-nowrap transition-all ${
+              className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold capitalize whitespace-nowrap transition-all ${
                 filterPlatform === tab
-                  ? 'bg-slate-800 text-amber-400 shadow-sm border border-slate-700'
+                  ? 'bg-slate-800 text-amber-400 shadow-md border border-slate-700 scale-[1.02]'
                   : 'text-slate-400 hover:text-slate-200'
               }`}
             >
@@ -92,31 +92,31 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
 
       {/* Table */}
       <div className="overflow-x-auto">
-        <table className="w-full text-left text-sm text-slate-300">
-          <thead className="bg-slate-950/60 text-xs uppercase tracking-wider text-slate-400 border-b border-slate-800">
+        <table className="w-full text-left text-sm sm:text-base text-slate-300">
+          <thead className="bg-slate-950/80 text-xs sm:text-sm uppercase tracking-wider text-slate-400 border-b border-slate-800 font-bold">
             <tr>
-              <th scope="col" className="px-6 py-3.5 w-16 text-center">Rank</th>
-              <th scope="col" className="px-6 py-3.5">Coder Profile</th>
-              <th scope="col" className="px-6 py-3.5">Today's Solves by Platform</th>
-              <th scope="col" className="px-6 py-3.5 text-right">Global Challenge Solves</th>
+              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5 w-24 text-center">Rank</th>
+              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5">Coder Profile</th>
+              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5">Today's Solves by Platform</th>
+              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5 text-right">Global Challenge Solves</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 font-medium">
+          <tbody className="divide-y divide-slate-800/70 font-medium">
             {filteredUsers.length === 0 ? (
               <tr>
-                <td colSpan={4} className="px-6 py-16 text-center">
-                  <div className="max-w-xs mx-auto space-y-3">
-                    <div className="w-10 h-10 rounded-xl bg-slate-800 text-slate-400 mx-auto flex items-center justify-center font-bold">
-                      <Search className="w-5 h-5" />
+                <td colSpan={4} className="px-6 sm:px-8 py-20 text-center">
+                  <div className="max-w-md mx-auto space-y-3">
+                    <div className="w-12 h-12 rounded-2xl bg-slate-800 text-slate-400 mx-auto flex items-center justify-center font-bold shadow-lg">
+                      <Search className="w-6 h-6" />
                     </div>
-                    <div className="text-slate-200 font-semibold text-sm">No coders found</div>
-                    <p className="text-xs text-slate-400">
+                    <div className="text-slate-100 font-bold text-base sm:text-lg">No coders found</div>
+                    <p className="text-xs sm:text-sm text-slate-400">
                       No coders match &quot;{search || filterPlatform}&quot;. Try adjusting your search query or platform filter.
                     </p>
                     {search && (
                       <button
                         onClick={() => setSearch('')}
-                        className="text-xs font-semibold text-amber-400 hover:text-amber-300 underline pt-1 inline-block"
+                        className="text-xs sm:text-sm font-bold text-amber-400 hover:text-amber-300 underline pt-2 inline-block"
                       >
                         Clear search
                       </button>
@@ -135,16 +135,16 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                     className="hover:bg-slate-800/40 transition-colors group"
                   >
                     {/* Rank */}
-                    <td className="px-6 py-4 text-center">
+                    <td className="px-6 sm:px-8 py-5 sm:py-6 text-center">
                       <span
-                        className={`inline-flex items-center justify-center w-8 h-8 rounded-lg font-bold text-xs tabular-nums ${
+                        className={`inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl font-black text-sm sm:text-base tabular-nums shadow-sm ${
                           idx === 0
-                            ? 'bg-amber-400/20 text-amber-300 border border-amber-400/40'
+                            ? 'bg-amber-400/20 text-amber-300 border-2 border-amber-400/50 shadow-amber-500/20 shadow-md'
                             : idx === 1
-                            ? 'bg-slate-300/20 text-slate-200 border border-slate-300/40'
+                            ? 'bg-slate-300/20 text-slate-100 border-2 border-slate-300/50 shadow-slate-500/20 shadow-md'
                             : idx === 2
-                            ? 'bg-amber-600/20 text-amber-300 border border-amber-600/40'
-                            : 'bg-slate-800/60 text-slate-300'
+                            ? 'bg-amber-600/20 text-amber-300 border-2 border-amber-600/50 shadow-amber-600/20 shadow-md'
+                            : 'bg-slate-800/70 text-slate-300 border border-slate-700/60'
                         }`}
                       >
                         {idx + 1}
@@ -152,22 +152,22 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                     </td>
 
                     {/* Coder Info */}
-                    <td className="px-6 py-4">
-                      <div className="flex items-center space-x-3">
-                        <div className="w-9 h-9 rounded-xl bg-slate-800 flex items-center justify-center font-bold text-white border border-slate-700">
-                          {user.name.charAt(0)}
+                    <td className="px-6 sm:px-8 py-5 sm:py-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center font-black text-base sm:text-lg text-white border border-slate-700/80 shadow-md shrink-0">
+                          {user.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
-                          <div className="font-semibold text-slate-100 flex items-center space-x-2">
-                            <span>{user.name}</span>
+                          <div className="font-bold text-base sm:text-lg text-white group-hover:text-amber-400 transition-colors">
+                            {user.name}
                           </div>
                         </div>
                       </div>
                     </td>
 
                     {/* Platforms */}
-                    <td className="px-6 py-4">
-                      <div className="flex flex-wrap gap-1.5 items-center">
+                    <td className="px-6 sm:px-8 py-5 sm:py-6">
+                      <div className="flex flex-wrap gap-2 items-center">
                         {user.handles?.leetcode?.trim() ||
                         user.handles?.codeforces?.trim() ||
                         user.handles?.codechef?.trim() ? (
@@ -189,29 +189,32 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                             />
                           </>
                         ) : (
-                          <span className="text-xs text-slate-500 italic">No platforms connected</span>
+                          <span className="text-xs sm:text-sm text-slate-500 italic">No platforms connected</span>
                         )}
                       </div>
                     </td>
 
                     {/* Solved Count & Bar */}
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-6 sm:px-8 py-5 sm:py-6 text-right">
                       <div className="flex flex-col items-end">
-                        <span className="text-xl font-extrabold text-amber-400 tabular-nums">
-                          {filterPlatform === 'leetcode'
-                            ? user.stats.leetcode
-                            : filterPlatform === 'codeforces'
-                            ? user.stats.codeforces
-                            : filterPlatform === 'codechef'
-                            ? user.stats.codechef
-                            : (user.stats.totalSolved ?? user.stats.todaySolved ?? 0)}
-                        </span>
-                        <div className="text-[11px] text-slate-400 mt-0.5">
+                        <div className="text-2xl sm:text-3xl lg:text-4xl font-black text-amber-400 tabular-nums flex items-center justify-end gap-1.5">
+                          <Flame className="w-5 h-5 sm:w-6 sm:h-6 text-amber-500 shrink-0" />
+                          <span>
+                            {filterPlatform === 'leetcode'
+                              ? user.stats.leetcode
+                              : filterPlatform === 'codeforces'
+                              ? user.stats.codeforces
+                              : filterPlatform === 'codechef'
+                              ? user.stats.codechef
+                              : (user.stats.totalSolved ?? user.stats.todaySolved ?? 0)}
+                          </span>
+                        </div>
+                        <div className="text-xs sm:text-sm text-slate-400 font-medium mt-1">
                           {user.stats.todaySolved > 0 ? `+${user.stats.todaySolved} today` : '0 solved today'}
                         </div>
-                        <div className="w-24 bg-slate-800 rounded-full h-1.5 mt-1 overflow-hidden">
+                        <div className="w-28 sm:w-36 lg:w-44 bg-slate-800 rounded-full h-2 mt-2 overflow-hidden shadow-inner">
                           <div
-                            className="bg-amber-400 h-1.5 rounded-full transition-all duration-300"
+                            className="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full transition-all duration-300 shadow-sm"
                             style={{ width: `${percentage}%` }}
                           />
                         </div>

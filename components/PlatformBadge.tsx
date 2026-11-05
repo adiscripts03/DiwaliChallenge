@@ -12,17 +12,35 @@ export default function PlatformBadge({ platform, handle, count }: PlatformBadge
     return null;
   }
 
-  const shortNames = {
-    leetcode: 'LC',
-    codeforces: 'CF',
-    codechef: 'CC',
-  };
+  const platformConfig = {
+    leetcode: {
+      short: 'LC',
+      label: 'LeetCode',
+      text: 'text-amber-400',
+      border: 'border-amber-500/30',
+      bg: 'bg-amber-500/10',
+    },
+    codeforces: {
+      short: 'CF',
+      label: 'Codeforces',
+      text: 'text-blue-400',
+      border: 'border-blue-500/30',
+      bg: 'bg-blue-500/10',
+    },
+    codechef: {
+      short: 'CC',
+      label: 'CodeChef',
+      text: 'text-emerald-400',
+      border: 'border-emerald-500/30',
+      bg: 'bg-emerald-500/10',
+    },
+  }[platform];
 
   return (
-    <span className="inline-flex items-center text-xs text-amber-100/75 mr-3 py-0.5 select-none font-normal">
-      <span className="text-amber-400/90 font-semibold mr-1">{shortNames[platform]}:</span>
-      <span className="text-white font-bold tabular-nums mr-1.5">{count}</span>
-      <span className="text-amber-200/40 text-[11px] font-mono">(@{handle})</span>
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-950/80 border ${platformConfig.border} text-xs sm:text-sm select-none shadow-sm transition-transform hover:scale-105`}>
+      <span className={`${platformConfig.text} font-bold`}>{platformConfig.short}:</span>
+      <span className="text-white font-black tabular-nums">{count}</span>
+      <span className="text-slate-400 text-[11px] sm:text-xs font-mono">(@{handle})</span>
     </span>
   );
 }
