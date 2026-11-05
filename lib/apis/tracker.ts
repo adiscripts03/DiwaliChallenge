@@ -28,23 +28,27 @@ export async function syncUserSolves(user: User): Promise<UserSyncResult> {
   const [cfRes, lcRes, ccRes] = await Promise.all([
     user.handles?.codeforces?.trim()
       ? fetchCodeforcesSolved(user.handles.codeforces.trim(), startOfToday)
-      : Promise.resolve({ platform: 'codeforces' as const, handle: '', count: 0, problems: [] }),
+      : Promise.resolve<CodeforcesResult>({ platform: 'codeforces', handle: '', count: 0, problems: [] }),
     user.handles?.leetcode?.trim()
       ? fetchLeetCodeSolved(user.handles.leetcode.trim(), startOfToday)
-      : Promise.resolve({ platform: 'leetcode' as const, handle: '', count: 0, problems: [] }),
+      : Promise.resolve<LeetCodeResult>({ platform: 'leetcode', handle: '', count: 0, problems: [] }),
     user.handles?.codechef?.trim()
       ? fetchCodeChefSolved(user.handles.codechef.trim(), startOfToday)
-      : Promise.resolve({ platform: 'codechef' as const, handle: '', count: 0, problems: [] }),
+      : Promise.resolve<CodeChefResult>({ platform: 'codechef', handle: '', count: 0, problems: [] }),
   ]);
 
-  const todayCount = cfRes.count + lcRes.count + ccRes.count;
+  const isSameDay = user.lastDailyDate === todayDateStr;
+  const cfCount = cfRes.error ? (isSameDay ? (user.stats?.codeforces ?? 0) : 0) : cfRes.count;
+  const lcCount = lcRes.error ? (isSameDay ? (user.stats?.leetcode ?? 0) : 0) : lcRes.count;
+  const ccCount = ccRes.error ? (isSameDay ? (user.stats?.codechef ?? 0) : 0) : ccRes.count;
+  const todayCount = cfCount + lcCount + ccCount;
 
   const newStats: UserStats = {
     totalSolved: (user.stats?.totalSolved || 0) + todayCount,
     todaySolved: todayCount,
-    codeforces: cfRes.count,
-    leetcode: lcRes.count,
-    codechef: ccRes.count,
+    codeforces: cfCount,
+    leetcode: lcCount,
+    codechef: ccCount,
     lastUpdated: new Date().toISOString(),
   };
 

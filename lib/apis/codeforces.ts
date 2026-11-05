@@ -1,3 +1,5 @@
+export const MIN_CODEFORCES_RATING = 800;
+
 export interface CodeforcesResult {
   platform: 'codeforces';
   handle: string;
@@ -8,6 +10,7 @@ export interface CodeforcesResult {
 
 /**
  * Fetches unique problems solved on Codeforces since a given timestamp.
+ * Enforces a strict minimum problem rating threshold (>= 800).
  * @param handle Codeforces username
  * @param sinceTimestamp Epoch seconds timestamp
  */
@@ -56,6 +59,13 @@ export async function fetchCodeforcesSolved(
         }
 
         if (sub.verdict === 'OK' && sub.problem) {
+          // Rule: Question must have a minimum rating of 800 to be counted.
+          // Submissions with ratings below 800 or unrated are not counted.
+          const rating = sub.problem.rating;
+          if (rating === undefined || rating === null || rating < MIN_CODEFORCES_RATING) {
+            continue;
+          }
+
           const id = `${sub.problem.contestId || ''}${sub.problem.index || ''} - ${
             sub.problem.name || 'Problem'
           }`;

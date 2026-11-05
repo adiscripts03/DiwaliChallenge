@@ -488,29 +488,18 @@ export const db = {
         if (existing) {
           const isSameDay = existing.lastDailyDate === today;
           const currentTotal = existing.totalSolved ?? existing.todaySolved ?? 0;
+          const currentToday = existing.todaySolved ?? 0;
 
-          // Enforce non-decreasing / monotonic scores:
-          // A user's solve count must NEVER drop on resync due to wrong attempts,
-          // API pagination, or transient external API rate-limits.
-          const safeLc = isSameDay ? Math.max(existing.solvedLc ?? 0, stats.leetcode ?? 0) : (stats.leetcode ?? 0);
-          const safeCf = isSameDay ? Math.max(existing.solvedCf ?? 0, stats.codeforces ?? 0) : (stats.codeforces ?? 0);
-          const safeCc = isSameDay ? Math.max(existing.solvedCc ?? 0, stats.codechef ?? 0) : (stats.codechef ?? 0);
-          const platformSum = safeLc + safeCf + safeCc;
+          // When resyncing on the same day, prior days' cumulative total is:
+          const priorDaysTotal = isSameDay
+            ? Math.max(0, currentTotal - currentToday)
+            : currentTotal;
 
-          const safeTodaySolved = isSameDay
-            ? Math.max(existing.todaySolved ?? 0, platformSum, stats.todaySolved ?? 0)
-            : Math.max(platformSum, stats.todaySolved ?? 0);
-
-          let newTotal = currentTotal;
-          if (isSameDay) {
-            // Only add positive delta (never decrease, strictly non-negative delta)
-            const previousToday = existing.todaySolved ?? 0;
-            const increaseInToday = Math.max(0, safeTodaySolved - previousToday);
-            newTotal = Math.max(currentTotal, currentTotal + increaseInToday);
-          } else {
-            // First sync of a new day: add today's verified solves to cumulative total
-            newTotal = Math.max(currentTotal, currentTotal + safeTodaySolved);
-          }
+          const safeLc = stats.leetcode ?? 0;
+          const safeCf = stats.codeforces ?? 0;
+          const safeCc = stats.codechef ?? 0;
+          const safeTodaySolved = safeLc + safeCf + safeCc;
+          const newTotal = priorDaysTotal + safeTodaySolved;
 
           const updated = await prisma.user.update({
             where: { id },
@@ -562,24 +551,17 @@ export const db = {
     const existingUser = dbData.users[index];
     const isSameDay = existingUser.lastDailyDate === today;
     const currentTotal = existingUser.stats?.totalSolved ?? existingUser.stats?.todaySolved ?? 0;
+    const currentToday = existingUser.stats?.todaySolved ?? 0;
 
-    const safeLc = isSameDay ? Math.max(existingUser.stats?.leetcode ?? 0, stats.leetcode ?? 0) : (stats.leetcode ?? 0);
-    const safeCf = isSameDay ? Math.max(existingUser.stats?.codeforces ?? 0, stats.codeforces ?? 0) : (stats.codeforces ?? 0);
-    const safeCc = isSameDay ? Math.max(existingUser.stats?.codechef ?? 0, stats.codechef ?? 0) : (stats.codechef ?? 0);
-    const platformSum = safeLc + safeCf + safeCc;
+    const priorDaysTotal = isSameDay
+      ? Math.max(0, currentTotal - currentToday)
+      : currentTotal;
 
-    const safeTodaySolved = isSameDay
-      ? Math.max(existingUser.stats?.todaySolved ?? 0, platformSum, stats.todaySolved ?? 0)
-      : Math.max(platformSum, stats.todaySolved ?? 0);
-
-    let newTotal = currentTotal;
-    if (isSameDay) {
-      const previousToday = existingUser.stats?.todaySolved ?? 0;
-      const increaseInToday = Math.max(0, safeTodaySolved - previousToday);
-      newTotal = Math.max(currentTotal, currentTotal + increaseInToday);
-    } else {
-      newTotal = Math.max(currentTotal, currentTotal + safeTodaySolved);
-    }
+    const safeLc = stats.leetcode ?? 0;
+    const safeCf = stats.codeforces ?? 0;
+    const safeCc = stats.codechef ?? 0;
+    const safeTodaySolved = safeLc + safeCf + safeCc;
+    const newTotal = priorDaysTotal + safeTodaySolved;
 
     dbData.users[index].stats = {
       totalSolved: newTotal,

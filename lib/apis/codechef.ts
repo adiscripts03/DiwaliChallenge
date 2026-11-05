@@ -1,5 +1,9 @@
 import axios from 'axios';
 import * as cheerio from 'cheerio';
+import fs from 'fs';
+import path from 'path';
+
+export const MIN_CODECHEF_RATING = 800;
 
 export interface CodeChefResult {
   platform: 'codechef';
@@ -8,6 +12,103 @@ export interface CodeChefResult {
   problems: string[];
   totalSolved?: number;
   error?: string;
+}
+
+// In-memory ratings cache backed by persistent file
+const RATINGS_CACHE_FILE = path.join(process.cwd(), 'data', 'codechef_ratings.json');
+const problemRatingsMap = new Map<string, number | null>();
+
+// Initialize cache from disk if available
+try {
+  if (fs.existsSync(RATINGS_CACHE_FILE)) {
+    const raw = fs.readFileSync(RATINGS_CACHE_FILE, 'utf8');
+    const parsed = JSON.parse(raw);
+    for (const [k, v] of Object.entries(parsed)) {
+      problemRatingsMap.set(k, typeof v === 'number' ? v : null);
+    }
+  }
+} catch {
+  // Graceful fallback if file is not accessible
+}
+
+function persistRatingsCache() {
+  try {
+    const obj: Record<string, number | null> = {};
+    problemRatingsMap.forEach((v, k) => {
+      obj[k] = v;
+    });
+    const dir = path.dirname(RATINGS_CACHE_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(RATINGS_CACHE_FILE, JSON.stringify(obj, null, 2));
+  } catch {}
+}
+
+/**
+ * Fetches difficulty rating for a CodeChef problem with aggressive caching.
+ * Returns null if the problem is unrated or does not exist.
+ */
+export async function getCodeChefProblemRating(problemCode: string): Promise<number | null> {
+  const code = problemCode.trim();
+  if (!code) return null;
+
+  if (problemRatingsMap.has(code)) {
+    return problemRatingsMap.get(code)!;
+  }
+
+  try {
+    const url = `https://www.codechef.com/api/contests/PRACTICE/problems/${encodeURIComponent(code)}`;
+    const res = await axios.get(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
+        Accept: 'application/json, text/plain, */*',
+      },
+      timeout: 6000,
+    });
+
+    if (res.data?.status === 'success' && res.data.difficulty_rating !== undefined && res.data.difficulty_rating !== null) {
+      const rating = Number(res.data.difficulty_rating);
+      problemRatingsMap.set(code, rating);
+      return rating;
+    }
+  } catch {}
+
+  problemRatingsMap.set(code, null);
+  return null;
+}
+
+/**
+ * Filters a set of problem codes strictly by minimum difficulty rating.
+ */
+async function filterCodeChefProblemsByMinRating(
+  problemCodes: string[],
+  minRating: number = MIN_CODECHEF_RATING
+): Promise<{ count: number; verifiedProblems: string[] }> {
+  const verified: string[] = [];
+  let cacheModified = false;
+
+  // Process in small parallel chunks to maximize speed without tripping rate limits
+  const chunkSize = 6;
+  for (let i = 0; i < problemCodes.length; i += chunkSize) {
+    const chunk = problemCodes.slice(i, i + chunkSize);
+    await Promise.all(
+      chunk.map(async (code) => {
+        const wasInCache = problemRatingsMap.has(code);
+        const rating = await getCodeChefProblemRating(code);
+        if (!wasInCache) cacheModified = true;
+
+        if (rating !== null && rating >= minRating) {
+          verified.push(`${code} [${rating}]`);
+        }
+      })
+    );
+  }
+
+  if (cacheModified) {
+    persistRatingsCache();
+  }
+
+  return { count: verified.length, verifiedProblems: verified };
 }
 
 /**
@@ -180,58 +281,26 @@ export async function fetchCodeChefSolved(
     }
 
     if (recentApiSucceeded) {
-      // Ground truth obtained directly from verified submissions table across pages
+      // Filter strictly for questions with difficulty rating >= 800
+      const { count, verifiedProblems } = await filterCodeChefProblemsByMinRating(
+        Array.from(uniqueAcceptedProblems),
+        MIN_CODECHEF_RATING
+      );
+
       return {
         platform: 'codechef',
         handle: cleanHandle,
-        count: uniqueAcceptedProblems.size,
-        problems: Array.from(uniqueAcceptedProblems),
+        count,
+        problems: verifiedProblems,
       };
     }
 
-    // Strategy 2: Heatmap fallback ONLY if recent API completely failed to respond
-    const profileRes = await axios.get(profileUrl, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36',
-      },
-      timeout: 10000,
-    });
-
-    let heatmapCount = 0;
-    const heatmapMatch = profileRes.data.match(/var\s+userDailySubmissionsStats\s*=\s*(\[[\s\S]*?\]);/);
-    if (heatmapMatch) {
-      try {
-        const stats: Array<{ date: string; value: number }> = JSON.parse(heatmapMatch[1]);
-        
-        // Parse date in Asia/Kolkata (IST) timezone
-        const parts = new Intl.DateTimeFormat('en-CA', {
-          timeZone: 'Asia/Kolkata',
-          year: 'numeric',
-          month: 'numeric',
-          day: 'numeric',
-        }).formatToParts(new Date(sinceTimestamp * 1000));
-
-        const year = parts.find((p) => p.type === 'year')?.value;
-        const month = parts.find((p) => p.type === 'month')?.value;
-        const day = parts.find((p) => p.type === 'day')?.value;
-
-        const targetKey = `${year}-${month}-${day}`;
-        const targetKeyWithLeadingZeros = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
-        const foundDay = stats.find(
-          (entry) => entry.date === targetKey || entry.date === targetKeyWithLeadingZeros
-        );
-        if (foundDay && typeof foundDay.value === 'number') {
-          heatmapCount = foundDay.value;
-        }
-      } catch {}
-    }
-
+    // If recent API could not retrieve individual problem codes, we cannot verify the 800+ rating requirement.
+    // Return 0 rather than granting unrated submissions.
     return {
       platform: 'codechef',
       handle: cleanHandle,
-      count: heatmapCount,
+      count: 0,
       problems: [],
     };
   } catch (error: any) {

@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 const globalForPrisma = global as unknown as { prisma: PrismaClient };
 
-const dbUrl = process.env.DATABASE_URL_UNPOOLED || process.env.DATABASE_URL;
+const dbUrl = process.env.DATABASE_URL || process.env.DATABASE_URL_UNPOOLED;
 
 export const prisma =
   globalForPrisma.prisma ||
