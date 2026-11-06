@@ -3,9 +3,10 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
-import { Trophy, LogOut, LogIn, UserPlus, Shield } from 'lucide-react';
+import { Trophy, LogOut, LogIn, UserPlus, Shield, Bug } from 'lucide-react';
 import GDGLogo from '@/components/GDGLogo';
 import ThemeToggle from '@/components/ThemeToggle';
+import BugReportModal from '@/components/BugReportModal';
 
 interface AuthUser {
   id: string;
@@ -17,6 +18,7 @@ interface AuthUser {
 export default function Navbar() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [showBugModal, setShowBugModal] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
 
@@ -132,9 +134,20 @@ export default function Navbar() {
             </>
           )}
 
+          <button
+            onClick={() => setShowBugModal(true)}
+            title="Report a bug or problem to Aditya"
+            className="flex items-center space-x-1.5 text-xs font-semibold px-2.5 py-1.5 rounded-lg text-amber-400/90 hover:text-amber-300 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all shadow-sm"
+          >
+            <Bug className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden sm:inline">Report Bug</span>
+          </button>
+
           <ThemeToggle />
         </nav>
       </div>
+
+      <BugReportModal isOpen={showBugModal} onClose={() => setShowBugModal(false)} />
     </header>
   );
 }

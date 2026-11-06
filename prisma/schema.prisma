@@ -35,3 +35,21 @@ model GlobalMeta {
   value     String
   updatedAt DateTime @updatedAt
 }
+
+model BugReport {
+  id          String   @id @default(uuid())
+  userName    String   @default("")
+  userEmail   String   @default("")
+  coderHandle String   @default("")
+  category    String   @default("other")
+  message     String
+  status      String   @default("open")
+  adminNotes  String   @default("")
+  deviceInfo  String   @default("")
+  pageUrl     String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([status])
+  @@index([createdAt(sort: Desc)])
+}

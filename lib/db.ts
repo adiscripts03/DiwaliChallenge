@@ -48,6 +48,31 @@ export interface AdminUserOverwriteInput {
   resetCooldown?: boolean;
 }
 
+export interface BugReport {
+  id: string;
+  userName: string;
+  userEmail: string;
+  coderHandle: string;
+  category: string;
+  message: string;
+  status: 'open' | 'in_progress' | 'resolved';
+  adminNotes: string;
+  deviceInfo: string;
+  pageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface CreateBugReportInput {
+  userName?: string;
+  userEmail?: string;
+  coderHandle?: string;
+  category?: string;
+  message: string;
+  deviceInfo?: string;
+  pageUrl?: string;
+}
+
 interface DatabaseSchema {
   users: User[];
   lastGlobalSync?: string;
@@ -56,6 +81,7 @@ interface DatabaseSchema {
     today: number;
     date: string;
   };
+  bugs?: BugReport[];
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
@@ -713,5 +739,173 @@ export const db = {
       totalViews: dbData.views.total,
       todayViews: dbData.views.date === today ? dbData.views.today : 0,
     };
+  },
+
+  async createBugReport(input: CreateBugReportInput): Promise<BugReport> {
+    const id = (globalThis.crypto?.randomUUID ? globalThis.crypto.randomUUID() : Math.random().toString(36).substring(2)) + Date.now().toString(36);
+    const now = new Date();
+    const newReport: BugReport = {
+      id,
+      userName: input.userName?.trim() || 'Anonymous Coder',
+      userEmail: input.userEmail?.trim() || '',
+      coderHandle: input.coderHandle?.trim() || '',
+      category: input.category?.trim() || 'other',
+      message: input.message.trim(),
+      status: 'open',
+      adminNotes: '',
+      deviceInfo: input.deviceInfo || '',
+      pageUrl: input.pageUrl || '',
+      createdAt: now.toISOString(),
+      updatedAt: now.toISOString(),
+    };
+
+    if (hasPostgresUrl()) {
+      try {
+        const row = await prisma.bugReport.create({
+          data: {
+            id,
+            userName: newReport.userName,
+            userEmail: newReport.userEmail,
+            coderHandle: newReport.coderHandle,
+            category: newReport.category,
+            message: newReport.message,
+            status: 'open',
+            adminNotes: '',
+            deviceInfo: newReport.deviceInfo,
+            pageUrl: newReport.pageUrl,
+          },
+        });
+        return {
+          id: row.id,
+          userName: row.userName,
+          userEmail: row.userEmail,
+          coderHandle: row.coderHandle,
+          category: row.category,
+          message: row.message,
+          status: row.status as 'open' | 'in_progress' | 'resolved',
+          adminNotes: row.adminNotes,
+          deviceInfo: row.deviceInfo,
+          pageUrl: row.pageUrl,
+          createdAt: row.createdAt.toISOString(),
+          updatedAt: row.updatedAt.toISOString(),
+        };
+      } catch (err: any) {
+        console.warn('Prisma createBugReport fallback to JSON:', err.message);
+      }
+    }
+
+    const dbData = ensureDbFile();
+    if (!dbData.bugs) dbData.bugs = [];
+    dbData.bugs.unshift(newReport);
+    saveDb(dbData);
+    return newReport;
+  },
+
+  async getBugReports(statusFilter?: string): Promise<{ reports: BugReport[]; openCount: number }> {
+    if (hasPostgresUrl()) {
+      try {
+        const whereClause = statusFilter && statusFilter !== 'all' ? { status: statusFilter } : {};
+        const [rows, openCount] = await Promise.all([
+          prisma.bugReport.findMany({
+            where: whereClause,
+            orderBy: { createdAt: 'desc' },
+          }),
+          prisma.bugReport.count({
+            where: { status: 'open' },
+          }),
+        ]);
+
+        return {
+          reports: rows.map((r) => ({
+            id: r.id,
+            userName: r.userName,
+            userEmail: r.userEmail,
+            coderHandle: r.coderHandle,
+            category: r.category,
+            message: r.message,
+            status: r.status as 'open' | 'in_progress' | 'resolved',
+            adminNotes: r.adminNotes,
+            deviceInfo: r.deviceInfo,
+            pageUrl: r.pageUrl,
+            createdAt: r.createdAt.toISOString(),
+            updatedAt: r.updatedAt.toISOString(),
+          })),
+          openCount,
+        };
+      } catch (err: any) {
+        console.warn('Prisma getBugReports fallback to JSON:', err.message);
+      }
+    }
+
+    const dbData = ensureDbFile();
+    const all = dbData.bugs || [];
+    const openCount = all.filter((b) => b.status === 'open').length;
+    const filtered = statusFilter && statusFilter !== 'all' ? all.filter((b) => b.status === statusFilter) : all;
+    return { reports: filtered, openCount };
+  },
+
+  async updateBugReport(
+    id: string,
+    updates: { status?: 'open' | 'in_progress' | 'resolved'; adminNotes?: string }
+  ): Promise<BugReport | null> {
+    if (hasPostgresUrl()) {
+      try {
+        const row = await prisma.bugReport.update({
+          where: { id },
+          data: {
+            ...(updates.status ? { status: updates.status } : {}),
+            ...(updates.adminNotes !== undefined ? { adminNotes: updates.adminNotes } : {}),
+          },
+        });
+        return {
+          id: row.id,
+          userName: row.userName,
+          userEmail: row.userEmail,
+          coderHandle: row.coderHandle,
+          category: row.category,
+          message: row.message,
+          status: row.status as 'open' | 'in_progress' | 'resolved',
+          adminNotes: row.adminNotes,
+          deviceInfo: row.deviceInfo,
+          pageUrl: row.pageUrl,
+          createdAt: row.createdAt.toISOString(),
+          updatedAt: row.updatedAt.toISOString(),
+        };
+      } catch (err: any) {
+        console.warn('Prisma updateBugReport fallback to JSON:', err.message);
+      }
+    }
+
+    const dbData = ensureDbFile();
+    if (!dbData.bugs) return null;
+    const idx = dbData.bugs.findIndex((b) => b.id === id);
+    if (idx === -1) return null;
+
+    if (updates.status) dbData.bugs[idx].status = updates.status;
+    if (updates.adminNotes !== undefined) dbData.bugs[idx].adminNotes = updates.adminNotes;
+    dbData.bugs[idx].updatedAt = new Date().toISOString();
+    saveDb(dbData);
+    return dbData.bugs[idx];
+  },
+
+  async deleteBugReport(id: string): Promise<boolean> {
+    if (hasPostgresUrl()) {
+      try {
+        await prisma.bugReport.delete({ where: { id } });
+        return true;
+      } catch (err: any) {
+        console.warn('Prisma deleteBugReport fallback to JSON:', err.message);
+      }
+    }
+
+    const dbData = ensureDbFile();
+    if (!dbData.bugs) return false;
+    const initialLen = dbData.bugs.length;
+    dbData.bugs = dbData.bugs.filter((b) => b.id !== id);
+    if (dbData.bugs.length !== initialLen) {
+      saveDb(dbData);
+      return true;
+    }
+    return false;
   },
 };

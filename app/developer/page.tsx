@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Github, Linkedin, Sparkles, Flame } from 'lucide-react';
+import { Github, Linkedin, Sparkles, Flame, Bug } from 'lucide-react';
 
 export const metadata = {
   title: 'Meet the Man Behind | GDG Diwali Challenge',
@@ -95,6 +95,14 @@ export default function DeveloperPage() {
               >
                 <Sparkles className="w-5 h-5 text-amber-400" />
                 <span>Leaderboard</span>
+              </Link>
+
+              <Link
+                href="/report-bug"
+                className="inline-flex items-center space-x-2.5 px-7 py-4 rounded-2xl bg-rose-500/15 border border-rose-500/40 text-rose-300 hover:bg-rose-500/25 hover:text-white hover:scale-105 transition-all text-base sm:text-lg font-bold shadow-lg"
+              >
+                <Bug className="w-5 h-5 text-rose-400" />
+                <span>Report a Bug</span>
               </Link>
             </div>
           </div>

@@ -70,6 +70,13 @@ export default function RootLayout({
                   >
                     Meet the Man Behind
                   </Link>
+                  <span className="hidden sm:inline text-slate-600">•</span>
+                  <Link
+                    href="/report-bug"
+                    className="font-medium text-amber-400/90 hover:text-amber-300 underline decoration-dotted transition-colors"
+                  >
+                    Report a Bug
+                  </Link>
                 </div>
               </div>
             </footer>

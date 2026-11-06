@@ -19,8 +19,30 @@ import {
   Save,
   Zap,
   RotateCcw,
+  Bug,
+  Trash2,
+  Mail,
+  MessageSquare,
+  Clock,
+  Filter,
+  Check,
 } from 'lucide-react';
 import PlatformBadge from '@/components/PlatformBadge';
+
+interface AdminBugReport {
+  id: string;
+  userName: string;
+  userEmail: string;
+  coderHandle: string;
+  category: string;
+  message: string;
+  status: 'open' | 'in_progress' | 'resolved';
+  adminNotes: string;
+  deviceInfo: string;
+  pageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface AdminUser {
   id: string;
@@ -61,6 +83,18 @@ export default function AdminPortalPage() {
   const [search, setSearch] = useState('');
   const [filterPlatform, setFilterPlatform] = useState<'all' | 'leetcode' | 'codeforces' | 'codechef'>('all');
 
+  // Tabs state
+  const [activeTab, setActiveTab] = useState<'users' | 'bugs'>('users');
+
+  // Bug Reports state
+  const [bugs, setBugs] = useState<AdminBugReport[]>([]);
+  const [loadingBugs, setLoadingBugs] = useState(false);
+  const [openBugsCount, setOpenBugsCount] = useState(0);
+  const [bugFilterStatus, setBugFilterStatus] = useState<'all' | 'open' | 'in_progress' | 'resolved'>('all');
+  const [bugSearch, setBugSearch] = useState('');
+  const [updatingBugId, setUpdatingBugId] = useState<string | null>(null);
+  const [bugNotesInput, setBugNotesInput] = useState<{ [id: string]: string }>({});
+
   // Actions state
   const [syncingId, setSyncingId] = useState<string | null>(null);
   const [toast, setToast] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -89,6 +123,7 @@ export default function AdminPortalPage() {
       if (data.isAdmin) {
         setIsAdmin(true);
         loadUsers();
+        loadBugs();
       } else {
         setIsAdmin(false);
       }
@@ -118,6 +153,101 @@ export default function AdminPortalPage() {
     }
   };
 
+  const loadBugs = async () => {
+    setLoadingBugs(true);
+    try {
+      const res = await fetch('/api/bugs?status=all', { cache: 'no-store' });
+      const data = await res.json();
+      if (data.reports) {
+        setBugs(data.reports);
+        setOpenBugsCount(data.openCount || 0);
+        const notesMap: { [id: string]: string } = {};
+        data.reports.forEach((r: AdminBugReport) => {
+          notesMap[r.id] = r.adminNotes || '';
+        });
+        setBugNotesInput(notesMap);
+      }
+    } catch (err: any) {
+      showToast('error', 'Failed to load bug reports: ' + err.message);
+    } finally {
+      setLoadingBugs(false);
+    }
+  };
+
+  const handleUpdateBugStatus = async (id: string, newStatus: 'open' | 'in_progress' | 'resolved') => {
+    setUpdatingBugId(id);
+    try {
+      const res = await fetch(`/api/bugs/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to update status');
+
+      const oldBug = bugs.find((b) => b.id === id);
+      setBugs((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, status: newStatus } : b))
+      );
+
+      if (oldBug?.status === 'open' && newStatus !== 'open') {
+        setOpenBugsCount((c) => Math.max(0, c - 1));
+      } else if (oldBug?.status !== 'open' && newStatus === 'open') {
+        setOpenBugsCount((c) => c + 1);
+      }
+
+      showToast('success', `Bug marked as ${newStatus}`);
+    } catch (err: any) {
+      showToast('error', err.message);
+    } finally {
+      setUpdatingBugId(null);
+    }
+  };
+
+  const handleSaveBugNotes = async (id: string) => {
+    setUpdatingBugId(id);
+    try {
+      const notes = bugNotesInput[id] || '';
+      const res = await fetch(`/api/bugs/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ adminNotes: notes }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to save notes');
+
+      setBugs((prev) =>
+        prev.map((b) => (b.id === id ? { ...b, adminNotes: notes } : b))
+      );
+      showToast('success', 'Admin notes saved');
+    } catch (err: any) {
+      showToast('error', err.message);
+    } finally {
+      setUpdatingBugId(null);
+    }
+  };
+
+  const handleDeleteBug = async (id: string) => {
+    if (!confirm('Are you sure you want to permanently delete this bug report?')) return;
+    setUpdatingBugId(id);
+    try {
+      const res = await fetch(`/api/bugs/${id}`, { method: 'DELETE' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to delete bug');
+
+      const deleted = bugs.find((b) => b.id === id);
+      setBugs((prev) => prev.filter((b) => b.id !== id));
+      if (deleted?.status === 'open') {
+        setOpenBugsCount((c) => Math.max(0, c - 1));
+      }
+      showToast('success', 'Bug report deleted');
+    } catch (err: any) {
+      showToast('error', err.message);
+    } finally {
+      setUpdatingBugId(null);
+    }
+  };
+
   const showToast = (type: 'success' | 'error', text: string) => {
     setToast({ type, text });
     setTimeout(() => {
@@ -143,6 +273,7 @@ export default function AdminPortalPage() {
 
       setIsAdmin(true);
       loadUsers();
+      loadBugs();
       showToast('success', 'Admin access granted');
     } catch (err: any) {
       setLoginError(err.message);
@@ -274,6 +405,26 @@ export default function AdminPortalPage() {
     return true;
   });
 
+  // Filtered Bug Reports
+  const filteredBugs = bugs.filter((b) => {
+    const q = bugSearch.toLowerCase().trim();
+    const matchSearch =
+      !q ||
+      (b.userName || '').toLowerCase().includes(q) ||
+      (b.userEmail || '').toLowerCase().includes(q) ||
+      (b.coderHandle || '').toLowerCase().includes(q) ||
+      (b.message || '').toLowerCase().includes(q) ||
+      (b.category || '').toLowerCase().includes(q);
+
+    if (!matchSearch) return false;
+    if (bugFilterStatus === 'all') return true;
+    return b.status === bugFilterStatus;
+  });
+
+  const openBugs = bugs.filter((b) => b.status === 'open').length;
+  const inProgressBugs = bugs.filter((b) => b.status === 'in_progress').length;
+  const resolvedBugs = bugs.filter((b) => b.status === 'resolved').length;
+
   // Aggregate Metrics
   const totalSolvedAll = users.reduce(
     (acc, u) => acc + (u.stats.totalSolved ?? u.stats.todaySolved ?? 0),
@@ -402,12 +553,15 @@ export default function AdminPortalPage() {
 
         <div className="flex items-center space-x-2.5 self-end sm:self-auto">
           <button
-            onClick={loadUsers}
-            disabled={loadingUsers}
-            title="Refresh participant list"
+            onClick={() => {
+              loadUsers();
+              loadBugs();
+            }}
+            disabled={loadingUsers || loadingBugs}
+            title="Refresh participant list and bugs"
             className="flex items-center space-x-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 text-slate-200 border border-slate-700 hover:bg-slate-700 transition-colors"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-3.5 h-3.5 ${loadingUsers || loadingBugs ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
 
@@ -428,7 +582,59 @@ export default function AdminPortalPage() {
         </div>
       </div>
 
-      {/* Metrics Row */}
+      {/* Navigation Tabs */}
+      <div className="flex items-center space-x-2 border-b border-slate-800 pb-2">
+        <button
+          onClick={() => setActiveTab('users')}
+          className={`flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === 'users'
+              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+              : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Participants & Overrides</span>
+          <span
+            className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+              activeTab === 'users' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-300'
+            }`}
+          >
+            {users.length}
+          </span>
+        </button>
+
+        <button
+          onClick={() => {
+            setActiveTab('bugs');
+            if (bugs.length === 0) loadBugs();
+          }}
+          className={`flex items-center space-x-2 px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-bold transition-all relative ${
+            activeTab === 'bugs'
+              ? 'bg-amber-500 text-slate-950 shadow-md shadow-amber-500/20'
+              : 'bg-slate-900/80 text-slate-400 hover:text-white border border-slate-800'
+          }`}
+        >
+          <Bug className="w-4 h-4" />
+          <span>Bug Reports</span>
+          {openBugs > 0 ? (
+            <span className="ml-1.5 px-2 py-0.5 rounded-full text-[10px] font-black bg-rose-500 text-white animate-pulse">
+              {openBugs} open
+            </span>
+          ) : (
+            <span
+              className={`ml-1.5 px-2 py-0.5 rounded-full text-[11px] font-bold ${
+                activeTab === 'bugs' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-300'
+              }`}
+            >
+              {bugs.length}
+            </span>
+          )}
+        </button>
+      </div>
+
+      {activeTab === 'users' && (
+        <>
+          {/* Metrics Row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
           <div className="text-xs text-slate-400 font-medium">Registered Coders</div>
@@ -625,6 +831,283 @@ export default function AdminPortalPage() {
           </table>
         </div>
       </div>
+    </>
+  )}
+
+  {/* ===================== BUG REPORTS TAB ===================== */}
+  {activeTab === 'bugs' && (
+    <div className="space-y-6 animate-in fade-in">
+      {/* Bug Metrics Row */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <div className="text-xs text-slate-400 font-medium">Total Reports</div>
+          <div className="text-2xl font-black text-white mt-1 flex items-center space-x-2">
+            <Bug className="w-5 h-5 text-amber-400" />
+            <span>{bugs.length}</span>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <div className="text-xs text-slate-400 font-medium">Open Issues</div>
+          <div className="text-2xl font-black text-rose-400 mt-1 flex items-center space-x-1.5">
+            <AlertCircle className="w-5 h-5 text-rose-500" />
+            <span>{openBugs}</span>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <div className="text-xs text-slate-400 font-medium">In Progress</div>
+          <div className="text-2xl font-black text-sky-400 mt-1 flex items-center space-x-1.5">
+            <RefreshCw className="w-5 h-5 text-sky-500" />
+            <span>{inProgressBugs}</span>
+          </div>
+        </div>
+
+        <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4">
+          <div className="text-xs text-slate-400 font-medium">Resolved</div>
+          <div className="text-2xl font-black text-emerald-400 mt-1 flex items-center space-x-1.5">
+            <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+            <span>{resolvedBugs}</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Bug Filter Toolbar */}
+      <div className="p-4 bg-slate-900/70 border border-slate-800 rounded-2xl flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="relative w-full sm:w-80">
+          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            value={bugSearch}
+            onChange={(e) => setBugSearch(e.target.value)}
+            placeholder="Search bugs by reporter, handle, keyword..."
+            className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-9 pr-4 py-2 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-amber-400"
+          />
+        </div>
+
+        {/* Status Filters */}
+        <div className="flex items-center space-x-1.5 w-full sm:w-auto overflow-x-auto pb-1 sm:pb-0">
+          <button
+            onClick={() => setBugFilterStatus('all')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+              bugFilterStatus === 'all'
+                ? 'bg-amber-500 text-slate-950 shadow-sm'
+                : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
+            }`}
+          >
+            All ({bugs.length})
+          </button>
+          <button
+            onClick={() => setBugFilterStatus('open')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+              bugFilterStatus === 'open'
+                ? 'bg-rose-500 text-white shadow-sm'
+                : 'bg-slate-800 text-rose-300 hover:bg-slate-700'
+            }`}
+          >
+            Open ({openBugs})
+          </button>
+          <button
+            onClick={() => setBugFilterStatus('in_progress')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+              bugFilterStatus === 'in_progress'
+                ? 'bg-sky-500 text-white shadow-sm'
+                : 'bg-slate-800 text-sky-300 hover:bg-slate-700'
+            }`}
+          >
+            In Progress ({inProgressBugs})
+          </button>
+          <button
+            onClick={() => setBugFilterStatus('resolved')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors whitespace-nowrap ${
+              bugFilterStatus === 'resolved'
+                ? 'bg-emerald-500 text-slate-950 shadow-sm'
+                : 'bg-slate-800 text-emerald-300 hover:bg-slate-700'
+            }`}
+          >
+            Resolved ({resolvedBugs})
+          </button>
+        </div>
+      </div>
+
+      {/* Bug Reports Cards List */}
+      <div className="space-y-4">
+        {loadingBugs ? (
+          <div className="py-16 text-center text-slate-400">
+            <RefreshCw className="w-8 h-8 animate-spin mx-auto text-amber-400 mb-2" />
+            <p className="text-xs">Loading bug reports...</p>
+          </div>
+        ) : filteredBugs.length === 0 ? (
+          <div className="py-16 text-center bg-slate-900/60 border border-slate-800 rounded-3xl p-8 space-y-3">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center mx-auto">
+              <Bug className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-white">No Bug Reports Found</h3>
+            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+              {bugSearch || bugFilterStatus !== 'all'
+                ? 'No reports match your current search or filter.'
+                : 'Great news! No bug reports have been submitted yet, or all issues are resolved.'}
+            </p>
+          </div>
+        ) : (
+          filteredBugs.map((bug) => (
+            <div
+              key={bug.id}
+              className={`bg-slate-900/80 border rounded-3xl p-5 sm:p-6 shadow-xl space-y-4 transition-all ${
+                bug.status === 'open'
+                  ? 'border-rose-500/30'
+                  : bug.status === 'in_progress'
+                  ? 'border-sky-500/30'
+                  : 'border-slate-800'
+              }`}
+            >
+              {/* Header: Reporter, Timestamp, Category, Status */}
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-3">
+                <div className="flex items-start sm:items-center space-x-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center font-bold text-amber-400 shrink-0">
+                    {bug.userName?.charAt(0).toUpperCase() || 'B'}
+                  </div>
+                  <div>
+                    <div className="flex items-center space-x-2 flex-wrap">
+                      <span className="font-bold text-white text-sm sm:text-base">
+                        {bug.userName || 'Anonymous Coder'}
+                      </span>
+                      {bug.coderHandle && (
+                        <span className="px-2 py-0.5 rounded-full text-xs bg-slate-800 text-amber-300 font-mono border border-slate-700">
+                          {bug.coderHandle}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-center space-x-3 text-xs text-slate-400 mt-0.5">
+                      {bug.userEmail ? (
+                        <a
+                          href={`mailto:${bug.userEmail}?subject=Regarding your GDG Diwali Challenge Bug Report #${bug.id.slice(0, 8)}`}
+                          className="text-amber-400/90 hover:underline flex items-center gap-1"
+                        >
+                          <Mail className="w-3 h-3" />
+                          <span>{bug.userEmail}</span>
+                        </a>
+                      ) : (
+                        <span className="text-slate-500 italic">No email provided</span>
+                      )}
+                      <span>•</span>
+                      <span className="flex items-center gap-1 text-slate-400">
+                        <Clock className="w-3 h-3" />
+                        <span>
+                          {new Date(bug.createdAt).toLocaleString('en-IN', {
+                            timeZone: 'Asia/Kolkata',
+                            dateStyle: 'medium',
+                            timeStyle: 'short',
+                          })}{' '}
+                          IST
+                        </span>
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2 self-start sm:self-center">
+                  <span className="px-2.5 py-1 rounded-xl text-xs font-bold uppercase tracking-wider bg-slate-800 border border-slate-700 text-slate-300">
+                    {bug.category}
+                  </span>
+                  <span
+                    className={`px-3 py-1 rounded-xl text-xs font-bold uppercase tracking-wider ${
+                      bug.status === 'open'
+                        ? 'bg-rose-500/15 text-rose-300 border border-rose-500/40'
+                        : bug.status === 'in_progress'
+                        ? 'bg-sky-500/15 text-sky-300 border border-sky-500/40'
+                        : 'bg-emerald-500/15 text-emerald-300 border border-emerald-500/40'
+                    }`}
+                  >
+                    {bug.status === 'open'
+                      ? '⚠️ Open'
+                      : bug.status === 'in_progress'
+                      ? '🔄 In Progress'
+                      : '✅ Resolved'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Message Content */}
+              <div className="bg-slate-950/70 border border-slate-800/90 rounded-2xl p-4">
+                <p className="text-sm text-slate-100 whitespace-pre-wrap leading-relaxed font-sans">
+                  {bug.message}
+                </p>
+              </div>
+
+              {/* Context info */}
+              {(bug.pageUrl || bug.deviceInfo) && (
+                <div className="text-[11px] text-slate-500 flex flex-wrap items-center gap-x-4 gap-y-1 font-mono">
+                  {bug.pageUrl && <span>URL: {bug.pageUrl}</span>}
+                  {bug.deviceInfo && (
+                    <span className="truncate max-w-md">Device: {bug.deviceInfo}</span>
+                  )}
+                </div>
+              )}
+
+              {/* Action Controls Bar */}
+              <div className="pt-3 border-t border-slate-800 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+                {/* Change Status & Email */}
+                <div className="flex items-center space-x-2">
+                  <span className="text-xs font-semibold text-slate-400">Status:</span>
+                  <select
+                    value={bug.status}
+                    disabled={updatingBugId === bug.id}
+                    onChange={(e) =>
+                      handleUpdateBugStatus(bug.id, e.target.value as any)
+                    }
+                    className="bg-slate-950 border border-slate-700 rounded-xl px-3 py-1.5 text-xs font-bold text-slate-200 focus:outline-none focus:border-amber-400"
+                  >
+                    <option value="open">⚠️ Open</option>
+                    <option value="in_progress">🔄 In Progress</option>
+                    <option value="resolved">✅ Resolved</option>
+                  </select>
+
+                  {bug.userEmail && (
+                    <a
+                      href={`mailto:${bug.userEmail}?subject=Regarding your bug report on GDG Diwali Challenge`}
+                      className="flex items-center space-x-1 px-3 py-1.5 rounded-xl text-xs font-bold bg-slate-800 text-slate-300 hover:bg-slate-700 transition-colors border border-slate-700"
+                    >
+                      <Mail className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Email</span>
+                    </a>
+                  )}
+                </div>
+
+                {/* Admin Notes & Delete */}
+                <div className="flex-1 max-w-md flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={bugNotesInput[bug.id] ?? bug.adminNotes ?? ''}
+                    onChange={(e) =>
+                      setBugNotesInput({ ...bugNotesInput, [bug.id]: e.target.value })
+                    }
+                    placeholder="Internal notes (e.g. fixed, added score)..."
+                    className="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-amber-400"
+                  />
+                  <button
+                    onClick={() => handleSaveBugNotes(bug.id)}
+                    disabled={updatingBugId === bug.id}
+                    className="px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500/15 border border-amber-500/30 text-amber-300 hover:bg-amber-500/25 transition-colors shrink-0"
+                  >
+                    Save Note
+                  </button>
+                  <button
+                    onClick={() => handleDeleteBug(bug.id)}
+                    disabled={updatingBugId === bug.id}
+                    title="Delete report"
+                    className="p-1.5 rounded-xl text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 transition-colors shrink-0"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+    </div>
+  )}
 
       {/* --- Overwrite Modal --- */}
       {editingUser && (
