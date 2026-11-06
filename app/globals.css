@@ -351,3 +351,129 @@ html.light textarea::placeholder,
 html.light input::placeholder {
   color: #9c836d !important;
 }
+
+/* ========================================================
+   Bug Report Modal & Page in Light Mode
+   ======================================================== */
+html.light .bug-modal-backdrop {
+  background-color: rgba(245, 237, 225, 0.65) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+html.light .bug-modal-card {
+  background: #ffffff !important;
+  border-color: #ebdccb !important;
+  box-shadow: 0 25px 60px -15px rgba(60, 30, 10, 0.18), 0 0 0 1px #ecd2b0 !important;
+}
+
+html.light .bug-modal-header {
+  background-color: #fcf7ef !important;
+  border-bottom-color: #ebdccb !important;
+}
+
+html.light .bug-modal-header button {
+  color: #705843 !important;
+}
+html.light .bug-modal-header button:hover {
+  background-color: #ebdccb !important;
+  color: #1e150e !important;
+}
+
+html.light .bug-modal-card h2,
+html.light .bug-modal-card h3,
+html.light .bug-banner-card h1,
+html.light .bug-form-container h2,
+html.light .bug-form-container h3 {
+  color: #1e150e !important;
+}
+
+html.light .bug-modal-card p,
+html.light .bug-modal-card label,
+html.light .bug-banner-card p,
+html.light .bug-form-container label,
+html.light .bug-form-container p {
+  color: #423020 !important;
+}
+
+html.light .bug-modal-card .text-slate-400,
+html.light .bug-form-container .text-slate-400 {
+  color: #705843 !important;
+}
+
+html.light .bug-modal-card .text-slate-500,
+html.light .bug-form-container .text-slate-500 {
+  color: #8c725d !important;
+}
+
+/* Category Buttons in Light Mode */
+html.light .bug-cat-btn.unselected {
+  background-color: #fcf8f2 !important;
+  border-color: #ebdccb !important;
+  color: #5c4531 !important;
+}
+html.light .bug-cat-btn.unselected:hover {
+  background-color: #f7ede0 !important;
+  border-color: #d8bfab !important;
+  color: #1e150e !important;
+}
+html.light .bug-cat-btn.unselected span {
+  color: #2e1d12 !important;
+}
+html.light .bug-cat-btn.unselected p {
+  color: #78604d !important;
+}
+
+html.light .bug-cat-btn.selected {
+  background-color: #fef3c7 !important;
+  border-color: #d97706 !important;
+  color: #78350f !important;
+  box-shadow: 0 4px 12px rgba(217, 119, 6, 0.15) !important;
+}
+html.light .bug-cat-btn.selected span {
+  color: #78350f !important;
+}
+
+/* Textarea & Inputs in Bug Report */
+html.light .bug-modal-card textarea,
+html.light .bug-modal-card input,
+html.light .bug-form-container textarea,
+html.light .bug-form-container input {
+  background-color: #ffffff !important;
+  border-color: #dfcdb8 !important;
+  color: #1e150e !important;
+}
+html.light .bug-modal-card textarea::placeholder,
+html.light .bug-modal-card input::placeholder,
+html.light .bug-form-container textarea::placeholder,
+html.light .bug-form-container input::placeholder {
+  color: #9c836d !important;
+}
+html.light .bug-modal-card textarea:focus,
+html.light .bug-modal-card input:focus,
+html.light .bug-form-container textarea:focus,
+html.light .bug-form-container input:focus {
+  border-color: #b45309 !important;
+  box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.15) !important;
+}
+
+/* Cancel Button in Light Mode */
+html.light .bug-cancel-btn {
+  color: #705843 !important;
+}
+html.light .bug-cancel-btn:hover {
+  background-color: #f5ece0 !important;
+  color: #1e150e !important;
+}
+
+/* Bug Page Card & Banner in Light Mode */
+html.light .bug-page-card {
+  background-color: #ffffff !important;
+  border-color: #ebdccb !important;
+  box-shadow: 0 10px 30px -5px rgba(60, 30, 10, 0.05) !important;
+}
+html.light .bug-banner-card {
+  background: linear-gradient(90deg, #fffcf6 0%, #faede0 50%, #fffcf6 100%) !important;
+  border-color: #ecd2b0 !important;
+  box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.07) !important;
+}

@@ -28,7 +28,7 @@ export default function ReportBugPage() {
       </div>
 
       {/* Header Banner */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-600/10 border border-amber-500/30 p-6 sm:p-8 backdrop-blur-md shadow-2xl">
+      <div className="bug-banner-card relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/15 via-orange-500/10 to-amber-600/10 border border-amber-500/30 p-6 sm:p-8 backdrop-blur-md shadow-2xl">
         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1.5">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
@@ -52,7 +52,7 @@ export default function ReportBugPage() {
       </div>
 
       {/* Form Container */}
-      <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl backdrop-blur-md">
+      <div className="bug-page-card bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-xl backdrop-blur-md">
         <BugReportForm />
       </div>
     </div>

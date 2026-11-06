@@ -123,13 +123,13 @@ export default function BugReportModal({ isOpen, onClose, defaultCategory = 'sol
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in duration-200">
+    <div className="bug-modal-backdrop fixed inset-0 z-50 overflow-y-auto p-3 sm:p-6 flex min-h-screen items-center justify-center bg-black/75 backdrop-blur-md animate-in fade-in duration-200">
       <div
-        className="w-full max-w-xl bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-amber-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[92vh]"
+        className="bug-modal-card w-full max-w-xl my-auto bg-gradient-to-b from-slate-900 via-slate-900 to-slate-950 border border-amber-500/40 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="relative px-6 py-5 border-b border-amber-500/20 bg-slate-900/60 flex items-center justify-between">
+        <div className="bug-modal-header relative px-6 py-5 border-b border-amber-500/20 bg-slate-900/60 flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="w-10 h-10 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
               <Bug className="w-5 h-5" />
@@ -224,7 +224,7 @@ export default function BugReportModal({ isOpen, onClose, defaultCategory = 'sol
                         type="button"
                         key={cat.id}
                         onClick={() => setCategory(cat.id)}
-                        className={`text-left p-2.5 rounded-xl border text-xs font-semibold transition-all flex flex-col justify-between ${
+                        className={`bug-cat-btn ${isSelected ? 'selected' : 'unselected'} text-left p-2.5 rounded-xl border text-xs font-semibold transition-all flex flex-col justify-between ${
                           isSelected
                             ? 'bg-amber-500/20 border-amber-400 text-amber-300 shadow-md shadow-amber-500/10 scale-[1.02]'
                             : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
@@ -317,7 +317,7 @@ export default function BugReportModal({ isOpen, onClose, defaultCategory = 'sol
                   <button
                     type="button"
                     onClick={onClose}
-                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
+                    className="bug-cancel-btn flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
                   >
                     Cancel
                   </button>

@@ -168,7 +168,7 @@ export default function BugReportForm() {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="bug-form-container space-y-6">
       {error && (
         <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-sm flex items-center space-x-3">
           <AlertCircle className="w-5 h-5 shrink-0" />
@@ -190,7 +190,7 @@ export default function BugReportForm() {
                 type="button"
                 key={cat.id}
                 onClick={() => setCategory(cat.id)}
-                className={`text-left p-3.5 rounded-2xl border text-xs transition-all flex flex-col justify-between ${
+                className={`bug-cat-btn ${isSelected ? 'selected' : 'unselected'} text-left p-3.5 rounded-2xl border text-xs transition-all flex flex-col justify-between ${
                   isSelected
                     ? 'bg-amber-500/20 border-amber-400 text-amber-200 shadow-lg shadow-amber-500/10 scale-[1.02]'
                     : 'bg-slate-950/70 border-slate-800 text-slate-400 hover:border-slate-700 hover:text-slate-200'
