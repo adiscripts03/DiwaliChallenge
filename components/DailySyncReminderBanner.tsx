@@ -94,8 +94,8 @@ export default function DailySyncReminderBanner() {
       aria-label="Daily sync notice"
       className={`relative border-b transition-colors ${
         isUrgent
-          ? 'bg-gradient-to-r from-rose-950/90 via-amber-950/90 to-rose-950/90 border-rose-500/40 text-rose-100'
-          : 'bg-gradient-to-r from-amber-950/80 via-[#1c130b]/90 to-amber-950/80 border-amber-500/30 text-amber-100'
+          ? 'banner-sync-urgent bg-gradient-to-r from-rose-950/90 via-amber-950/90 to-rose-950/90 border-rose-500/40 text-rose-100'
+          : 'banner-sync-normal bg-gradient-to-r from-amber-950/80 via-[#1c130b]/90 to-amber-950/80 border-amber-500/30 text-amber-100'
       } backdrop-blur-md px-4 sm:px-6 py-2.5 shadow-lg`}
     >
       <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col md:flex-row items-center justify-between gap-3 text-xs sm:text-sm">

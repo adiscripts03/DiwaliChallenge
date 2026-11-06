@@ -49,7 +49,7 @@ export default function HomePage() {
   return (
     <div className="space-y-8">
       {/* Hero Header */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/90 via-[#140e09]/90 to-[#0d0a07]/90 border border-amber-900/40 p-6 sm:p-10 shadow-2xl backdrop-blur-sm">
+      <div className="hero-card relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/90 via-[#140e09]/90 to-[#0d0a07]/90 border border-amber-900/40 p-6 sm:p-10 shadow-2xl backdrop-blur-sm">
         {/* Soft background accents */}
         <div className="absolute top-0 right-0 -translate-y-12 translate-x-12 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 translate-y-12 -translate-x-12 w-96 h-96 bg-orange-600/10 rounded-full blur-3xl pointer-events-none" />

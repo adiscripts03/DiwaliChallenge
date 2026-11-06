@@ -80,8 +80,8 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
               onClick={() => setFilterPlatform(tab)}
               className={`px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold capitalize whitespace-nowrap transition-all ${
                 filterPlatform === tab
-                  ? 'bg-slate-800 text-amber-400 shadow-md border border-slate-700 scale-[1.02]'
-                  : 'text-slate-400 hover:text-slate-200'
+                  ? 'tab-active bg-slate-800 text-amber-400 shadow-md border border-slate-700 scale-[1.02]'
+                  : 'tab-inactive text-slate-400 hover:text-slate-200'
               }`}
             >
               {tab === 'all' ? 'All Combined' : tab}
@@ -139,12 +139,12 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                       <span
                         className={`inline-flex items-center justify-center w-10 h-10 sm:w-11 sm:h-11 rounded-2xl font-black text-sm sm:text-base tabular-nums shadow-sm ${
                           idx === 0
-                            ? 'bg-amber-400/20 text-amber-300 border-2 border-amber-400/50 shadow-amber-500/20 shadow-md'
+                            ? 'rank-badge-1 bg-amber-400/20 text-amber-300 border-2 border-amber-400/50 shadow-amber-500/20 shadow-md'
                             : idx === 1
-                            ? 'bg-slate-300/20 text-slate-100 border-2 border-slate-300/50 shadow-slate-500/20 shadow-md'
+                            ? 'rank-badge-2 bg-slate-300/20 text-slate-100 border-2 border-slate-300/50 shadow-slate-500/20 shadow-md'
                             : idx === 2
-                            ? 'bg-amber-600/20 text-amber-300 border-2 border-amber-600/50 shadow-amber-600/20 shadow-md'
-                            : 'bg-slate-800/70 text-slate-300 border border-slate-700/60'
+                            ? 'rank-badge-3 bg-amber-600/20 text-amber-300 border-2 border-amber-600/50 shadow-amber-600/20 shadow-md'
+                            : 'rank-badge-default bg-slate-800/70 text-slate-300 border border-slate-700/60'
                         }`}
                       >
                         {idx + 1}
@@ -154,7 +154,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                     {/* Coder Info */}
                     <td className="px-6 sm:px-8 py-5 sm:py-6">
                       <div className="flex items-center space-x-4">
-                        <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center font-black text-base sm:text-lg text-white border border-slate-700/80 shadow-md shrink-0">
+                        <div className="coder-avatar w-11 h-11 sm:w-12 sm:h-12 rounded-2xl bg-gradient-to-tr from-slate-800 to-slate-700 flex items-center justify-center font-black text-base sm:text-lg text-white border border-slate-700/80 shadow-md shrink-0">
                           {user.name.charAt(0).toUpperCase()}
                         </div>
                         <div>
@@ -212,7 +212,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                         <div className="text-xs sm:text-sm text-slate-400 font-medium mt-1">
                           {user.stats.todaySolved > 0 ? `+${user.stats.todaySolved} today` : '0 solved today'}
                         </div>
-                        <div className="w-28 sm:w-36 lg:w-44 bg-slate-800 rounded-full h-2 mt-2 overflow-hidden shadow-inner">
+                        <div className="progress-track w-28 sm:w-36 lg:w-44 bg-slate-800 rounded-full h-2 mt-2 overflow-hidden shadow-inner">
                           <div
                             className="bg-gradient-to-r from-amber-500 to-amber-400 h-2 rounded-full transition-all duration-300 shadow-sm"
                             style={{ width: `${percentage}%` }}

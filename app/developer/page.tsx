@@ -12,7 +12,7 @@ export default function DeveloperPage() {
   return (
     <div className="w-full flex-1 flex flex-col justify-center min-h-[calc(100vh-14rem)] py-2 sm:py-6">
       {/* Full-Page Hero Card */}
-      <div className="w-full mx-auto flex-1 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/95 via-[#140e09]/95 to-[#0d0a07]/95 border border-amber-900/40 p-8 sm:p-14 lg:p-20 shadow-2xl backdrop-blur-md">
+      <div className="developer-hero-card w-full mx-auto flex-1 flex flex-col justify-center relative overflow-hidden rounded-3xl bg-gradient-to-b from-[#18120c]/95 via-[#140e09]/95 to-[#0d0a07]/95 border border-amber-900/40 p-8 sm:p-14 lg:p-20 shadow-2xl backdrop-blur-md">
         {/* Ambient warm glows */}
         <div className="absolute top-0 right-0 -translate-y-16 translate-x-16 w-[600px] h-[600px] bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
         <div className="absolute bottom-0 left-0 translate-y-16 -translate-x-16 w-[600px] h-[600px] bg-orange-600/15 rounded-full blur-3xl pointer-events-none" />
@@ -32,7 +32,7 @@ export default function DeveloperPage() {
                 className="object-cover object-center group-hover:scale-105 transition duration-500"
               />
             </div>
-            <div className="absolute -bottom-5 left-1/2 -translate-x-1/2 px-6 py-2.5 bg-black/95 border border-amber-400/80 rounded-full text-sm sm:text-base font-black text-amber-300 shadow-2xl whitespace-nowrap tracking-wide">
+            <div className="dev-team-pill absolute -bottom-5 left-1/2 -translate-x-1/2 px-6 py-2.5 bg-black/95 border border-amber-400/80 rounded-full text-sm sm:text-base font-black text-amber-300 shadow-2xl whitespace-nowrap tracking-wide">
               🐺 The Entire Website Team
             </div>
           </div>

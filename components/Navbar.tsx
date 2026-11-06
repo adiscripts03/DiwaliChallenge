@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import { Trophy, LogOut, LogIn, UserPlus, Shield } from 'lucide-react';
 import GDGLogo from '@/components/GDGLogo';
+import ThemeToggle from '@/components/ThemeToggle';
 
 interface AuthUser {
   id: string;
@@ -130,6 +131,8 @@ export default function Navbar() {
               )}
             </>
           )}
+
+          <ThemeToggle />
         </nav>
       </div>
     </header>

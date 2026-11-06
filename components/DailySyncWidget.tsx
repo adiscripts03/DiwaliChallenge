@@ -64,7 +64,7 @@ export default function DailySyncWidget() {
   const isUrgent = countdown.hours < 2;
 
   return (
-    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#17100a] via-[#1f150d] to-[#17100a] border border-amber-500/30 p-5 sm:p-6 shadow-xl backdrop-blur-md">
+    <div className="daily-sync-card relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#17100a] via-[#1f150d] to-[#17100a] border border-amber-500/30 p-5 sm:p-6 shadow-xl backdrop-blur-md">
       {/* Decorative Glow */}
       <div className="absolute top-0 right-1/4 -translate-y-8 w-64 h-64 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 

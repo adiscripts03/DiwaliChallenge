@@ -6,6 +6,7 @@ import DailySyncReminderBanner from '@/components/DailySyncReminderBanner';
 import DiyaBackground from '@/components/DiyaBackground';
 import FooterViewCounter from '@/components/FooterViewCounter';
 import DiwaliGreetingAnimation from '@/components/DiwaliGreetingAnimation';
+import { ThemeProvider } from '@/components/ThemeProvider';
 
 export const metadata: Metadata = {
   title: 'GDG Diwali Challenge | Competitive Programming Leaderboard',
@@ -18,8 +19,21 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){
+              try {
+                var saved = localStorage.getItem('gdg_theme');
+                var theme = saved === 'light' ? 'light' : 'dark';
+                document.documentElement.classList.toggle('light', theme === 'light');
+                document.documentElement.classList.toggle('dark', theme !== 'light');
+                document.documentElement.setAttribute('data-theme', theme);
+              } catch(e) {}
+            })()`
+          }}
+        />
         <link
           rel="preload"
           as="image"
@@ -35,30 +49,32 @@ export default function RootLayout({
         />
       </head>
       <body className="bg-[#0d0a07] text-[#fef3c7] min-h-screen flex flex-col selection:bg-amber-500/30 selection:text-amber-200 relative overflow-x-hidden">
-        <DiyaBackground />
-        <DiwaliGreetingAnimation />
-        <div className="relative z-10 flex flex-col min-h-screen">
-          <Navbar />
-          <DailySyncReminderBanner />
-          <main className="flex-1 w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 py-8">
-            {children}
-          </main>
-          <footer className="border-t border-slate-800/80 py-8 text-center text-xs text-slate-400">
-            <div className="flex flex-col items-center justify-center gap-3">
-              <FooterViewCounter />
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-slate-400">
-                <span>© {new Date().getFullYear()} GDG Diwali Challenge.</span>
-                <span className="hidden sm:inline text-slate-600">•</span>
-                <Link
-                  href="/developer"
-                  className="font-medium text-amber-400/90 hover:text-amber-300 underline decoration-dotted transition-colors"
-                >
-                  Meet the Man Behind
-                </Link>
+        <ThemeProvider>
+          <DiyaBackground />
+          <DiwaliGreetingAnimation />
+          <div className="relative z-10 flex flex-col min-h-screen">
+            <Navbar />
+            <DailySyncReminderBanner />
+            <main className="flex-1 w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 py-8">
+              {children}
+            </main>
+            <footer className="border-t border-slate-800/80 py-8 text-center text-xs text-slate-400">
+              <div className="flex flex-col items-center justify-center gap-3">
+                <FooterViewCounter />
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-slate-400">
+                  <span>© {new Date().getFullYear()} GDG Diwali Challenge.</span>
+                  <span className="hidden sm:inline text-slate-600">•</span>
+                  <Link
+                    href="/developer"
+                    className="font-medium text-amber-400/90 hover:text-amber-300 underline decoration-dotted transition-colors"
+                  >
+                    Meet the Man Behind
+                  </Link>
+                </div>
               </div>
-            </div>
-          </footer>
-        </div>
+            </footer>
+          </div>
+        </ThemeProvider>
       </body>
     </html>
   );

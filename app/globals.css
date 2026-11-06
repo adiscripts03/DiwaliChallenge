@@ -7,6 +7,12 @@
   --foreground: #fef3c7;
 }
 
+html.light {
+  color-scheme: light;
+  --background: #faf6f0;
+  --foreground: #1e150e;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -14,6 +20,7 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
   overflow-x: hidden;
   font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Tabular nums for metric numbers */
@@ -37,5 +44,295 @@ body {
   background: #543b25;
 }
 
+/* ========================================================
+   LIGHT MODE: FESTIVE GOLDEN IVORY THEME
+   Warm ivory/cream background with deep espresso text, crisp 
+   white cards, and polished festive gold & terracotta accents.
+   ======================================================== */
 
+html.light body {
+  background-color: #faf6f0 !important;
+  color: #1e150e !important;
+}
 
+/* Base Headings & Text */
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light h5,
+html.light h6 {
+  color: #1a120b !important;
+}
+
+html.light .text-white {
+  color: #1a120b !important;
+}
+
+html.light .text-slate-100,
+html.light .text-slate-200 {
+  color: #241a10 !important;
+}
+
+html.light .text-slate-300,
+html.light .text-slate-400 {
+  color: #5a4430 !important;
+}
+
+html.light .text-slate-500 {
+  color: #7d634d !important;
+}
+
+html.light p {
+  color: #3b2a1a !important;
+}
+
+html.light [class*="text-amber-100"],
+html.light [class*="text-amber-200"] {
+  color: #3f2d1c !important;
+}
+
+html.light [class*="text-amber-300"] {
+  color: #5c3e21 !important;
+}
+
+/* Rich, high-contrast amber for light backgrounds */
+html.light .text-amber-400,
+html.light .text-amber-500 {
+  color: #b45309 !important;
+}
+
+html.light [class*="text-amber-400"] {
+  color: #b45309 !important;
+}
+
+/* Card Backgrounds & Surfaces */
+html.light .bg-slate-900,
+html.light .bg-slate-900\/60,
+html.light .bg-slate-900\/70,
+html.light .bg-slate-900\/80,
+html.light .bg-slate-900\/90 {
+  background-color: #ffffff !important;
+  box-shadow: 0 4px 20px -2px rgba(180, 83, 9, 0.05), 0 2px 6px -1px rgba(0, 0, 0, 0.03) !important;
+}
+
+html.light .bg-slate-950,
+html.light .bg-slate-950\/60,
+html.light .bg-slate-950\/70,
+html.light .bg-slate-950\/80,
+html.light .bg-slate-950\/90 {
+  background-color: #fdfaf5 !important;
+}
+
+html.light .bg-black\/40,
+html.light .bg-black\/50,
+html.light .bg-black\/60,
+html.light .bg-black\/80 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 4px 16px -2px rgba(180, 83, 9, 0.04) !important;
+}
+
+/* Borders */
+html.light .border-slate-800,
+html.light .border-slate-800\/60,
+html.light .border-slate-800\/70,
+html.light .border-slate-800\/80 {
+  border-color: #ebdccb !important;
+}
+
+html.light .border-slate-700,
+html.light .border-slate-700\/80 {
+  border-color: #dfcdb8 !important;
+}
+
+html.light .border-amber-900\/40 {
+  border-color: #e5d4be !important;
+}
+
+html.light .border-amber-500\/20,
+html.light .border-amber-500\/25,
+html.light .border-amber-500\/30 {
+  border-color: #e8cfae !important;
+}
+
+html.light .border-amber-500\/40 {
+  border-color: #d97706 !important;
+}
+
+/* Navigation Header */
+html.light header {
+  background-color: rgba(255, 255, 255, 0.92) !important;
+  border-bottom-color: #ebdccb !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Theme Toggle Button */
+html.light .theme-toggle-btn {
+  background-color: #fef8ee !important;
+  border-color: #f3d4a0 !important;
+  color: #b45309 !important;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.12) !important;
+}
+html.dark .theme-toggle-btn {
+  background-color: rgba(24, 18, 12, 0.9) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: #fbbf24 !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1) !important;
+}
+
+/* Hero Card in Light Mode */
+html.light .hero-card,
+html.light .bg-gradient-to-b.from-\[\#18120c\]\/90,
+html.light .bg-gradient-to-b.from-\[\#18120c\]\/95 {
+  background: linear-gradient(180deg, #ffffff 0%, #fdf9f2 50%, #faf3e6 100%) !important;
+  border-color: #e9d7c2 !important;
+  box-shadow: 0 16px 36px -8px rgba(180, 83, 9, 0.08) !important;
+}
+
+/* Daily Sync Widget in Light Mode */
+html.light .daily-sync-card,
+html.light .bg-gradient-to-r.from-\[\#17100a\] {
+  background: linear-gradient(90deg, #fffcf6 0%, #faf1e3 50%, #fffcf6 100%) !important;
+  border-color: #ecd2b0 !important;
+  box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.07) !important;
+}
+
+/* Daily Sync Reminder Banner in Light Mode */
+html.light .banner-sync-normal {
+  background: linear-gradient(90deg, #fef3c7 0%, #fffbeb 50%, #fef3c7 100%) !important;
+  border-color: #fcd34d !important;
+  color: #78350f !important;
+}
+html.light .banner-sync-urgent {
+  background: linear-gradient(90deg, #ffe4e6 0%, #fff1f2 50%, #ffe4e6 100%) !important;
+  border-color: #fecdd3 !important;
+  color: #881337 !important;
+}
+
+/* Table Header & Rows in Light Mode */
+html.light thead {
+  background-color: #f6ede0 !important;
+  border-bottom-color: #ebdccb !important;
+}
+html.light thead th {
+  color: #5c4531 !important;
+}
+
+html.light tbody tr:hover {
+  background-color: #fcf6eb !important;
+}
+
+html.light .divide-slate-800\/60 > * + *,
+html.light .divide-slate-800\/70 > * + * {
+  border-color: #f0e4d5 !important;
+}
+
+/* Form Inputs in Light Mode */
+html.light input[type="text"],
+html.light input[type="password"],
+html.light input[type="email"] {
+  background-color: #ffffff !important;
+  color: #1a120b !important;
+  border-color: #dfcdb8 !important;
+}
+html.light input::placeholder {
+  color: #9c826b !important;
+}
+html.light input:focus {
+  border-color: #d97706 !important;
+  box-shadow: 0 0 0 2px rgba(217, 119, 6, 0.2) !important;
+}
+
+/* Platform Filter Tabs in Leaderboard */
+html.light .bg-slate-950\/90.rounded-2xl {
+  background-color: #f5ece0 !important;
+  border-color: #e5d3c0 !important;
+}
+html.light .bg-slate-800.text-amber-400 {
+  background-color: #ffffff !important;
+  color: #b45309 !important;
+  border-color: #d9a05b !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Platform Badges (LC / CF / CC) in Light Mode */
+html.light .bg-slate-950\/80 {
+  background-color: #fbf5eb !important;
+}
+
+/* Podium in Light Mode */
+html.light .podium-first-card {
+  background: linear-gradient(180deg, #fffdf8 0%, #fff8eb 100%) !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 12px 28px -4px rgba(245, 158, 11, 0.15) !important;
+}
+html.light .podium-card {
+  background-color: #ffffff !important;
+  border-color: #ebdccb !important;
+  box-shadow: 0 6px 20px -2px rgba(180, 83, 9, 0.05) !important;
+}
+html.light .podium-avatar-inner {
+  background-color: #ffffff !important;
+}
+
+/* Rank Medals Badges in Light Mode */
+html.light .rank-badge-1 {
+  background-color: #fef3c7 !important;
+  color: #b45309 !important;
+  border-color: #f59e0b !important;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.2) !important;
+}
+html.light .rank-badge-2 {
+  background-color: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #94a3b8 !important;
+  box-shadow: 0 2px 8px rgba(100, 116, 139, 0.15) !important;
+}
+html.light .rank-badge-3 {
+  background-color: #ffedd5 !important;
+  color: #9a3412 !important;
+  border-color: #ea580c !important;
+  box-shadow: 0 2px 8px rgba(234, 88, 12, 0.15) !important;
+}
+html.light .rank-badge-default {
+  background-color: #f3e9db !important;
+  color: #3d2b1a !important;
+  border-color: #e2d2c0 !important;
+}
+
+/* Coder Avatar in Light Mode */
+html.light .coder-avatar {
+  background: linear-gradient(135deg, #f0e3d2 0%, #dfcbba 100%) !important;
+  color: #3d2b1a !important;
+  border-color: #d6bfab !important;
+}
+
+/* Progress Track in Light Mode */
+html.light .progress-track {
+  background-color: #eddccb !important;
+}
+
+/* Developer Page Pill in Light Mode */
+html.light .dev-team-pill {
+  background-color: #ffffff !important;
+  border-color: #d97706 !important;
+  color: #b45309 !important;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Scrollbar in Light Mode */
+html.light ::-webkit-scrollbar-track {
+  background: #f5ece0 !important;
+}
+html.light ::-webkit-scrollbar-thumb {
+  background: #d4bfa8 !important;
+}
+html.light ::-webkit-scrollbar-thumb:hover {
+  background: #b59a7f !important;
+}
+
+/* Footer in Light Mode */
+html.light footer {
+  border-top-color: #ebdccb !important;
+  color: #705843 !important;
+}
