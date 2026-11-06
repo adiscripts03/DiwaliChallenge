@@ -1,165 +1,248 @@
 # 🪔 GDG Diwali Challenge 2026
 
-**Official Real-Time Multi-Platform Competitive Coding Leaderboard**  
-Live Website: **[https://diwalichallenge.onrender.com/](https://diwalichallenge.onrender.com/)**
-
-GDG brings you an exclusive 9-day competitive coding challenge designed specially for 1st-year freshers! Track verified problems solved across **LeetCode**, **Codeforces**, and **CodeChef** on a festive, real-time leaderboard.
+**Production-Grade Multi-Platform Competitive Coding Leaderboard Platform**  
+🌐 **Live Application:** [https://diwalichallenge.onrender.com/](https://diwalichallenge.onrender.com/)  
+👨‍💻 **Solo Architect & Lead Developer:** [Aditya Singh](https://github.com/adiscripts03) ([LinkedIn](https://www.linkedin.com/in/aditya-singh-80827935a/))
 
 ---
 
-## 📅 Challenge Overview
+## 📊 Executive Summary & Operational Impact
 
-| Detail | Information |
+Built and orchestrated as a full-stack competitive coding platform for **Google Developer Groups (GDG)** at IIITN, hosting a high-stakes 10-day challenge for 1st-year computer science students during the festival break. The platform continuously tracks, verifies, filters, and ranks authentic problem submissions across **LeetCode**, **Codeforces**, and **CodeChef** in real time.
+
+| Metric | Result |
 | :--- | :--- |
-| **Event** | GDG Diwali Challenge 2026 |
-| **Duration** | **3rd November – 12th November 2026** (10-Day Sprint) |
-| **Target Audience** | 1st-Year Freshers only |
-| **Platforms Supported** | **LeetCode** • **Codeforces** • **CodeChef** |
-| **Official Portal** | [diwalichallenge.onrender.com](https://diwalichallenge.onrender.com/) |
-| **Login Credentials** | Use your registered college **BT ID** / Email |
-| **Timezone** | `Asia/Kolkata` (IST - UTC+05:30) |
+| **Active Participants** | **82+ registered college coders** |
+| **Supported Platforms** | **LeetCode** (GraphQL) • **Codeforces** (REST) • **CodeChef** (HTTP/Cheerio) |
+| **Contest Duration** | **3rd November – 12th November 2026** (10-Day Sprint) |
+| **Strict Quality Cutoff** | $\ge 800$ difficulty rating threshold (eliminates trivial problems) |
+| **Primary Timezone** | `Asia/Kolkata` (IST - UTC+05:30) with midnight rollovers |
+| **Database Architecture** | **Neon Serverless PostgreSQL** with Prisma ORM & disk fallbacks |
+| **Uptime & Reliability** | **Zero downtime** across peak contest hours and nightly sync rushes |
 
 ---
 
-## 📌 Mandatory Prerequisites
+## 🏛️ System Architecture
 
-To be eligible for rankings and prizes, participants must be members of all three:
-1. **GDG Community 2026–27**
-2. **GDG WhatsApp Channel**
-3. **CP / DSA WhatsApp Group**
+The application is built on a decoupled, cloud-native architecture designed to withstand external API rate-limiting, Cloudflare challenges, and cold-start connection limits while maintaining zero-stale-data guarantees for live leaderboard rankings.
 
----
+```mermaid
+flowchart TD
+    subgraph Client ["Client Layer (Browser)"]
+        UI["Next.js 14 Responsive UI<br/>(Tailwind CSS • Light/Dark Theme Engine)"]
+        SyncBtn["Sync Solves Button<br/>(5-Min Cooldown Gate)"]
+        BugModal["In-App Bug Reporting Modal<br/>(Direct to Lead Developer)"]
+    end
 
-## ⚡ Daily Progress Tracking & Contest Rules
+    subgraph Server ["Application Server (Next.js 14 App Router on Render)"]
+        API_Lead["/api/leaderboard<br/>(Dynamic Zero-Cache Engine)"]
+        API_Sync["/api/sync<br/>(Rate Limiter & Scraper Orchestrator)"]
+        API_Admin["/api/admin/*<br/>(RBAC Superuser Control Portal)"]
+        API_Bugs["/api/bugs<br/>(Triage & Dispatch Engine)"]
+        ScraperEngine["Scraper Engine (lib/apis)"]
+    end
 
-- **Nightly Manual Sync**:
-  - Every participant must log in and click **"Sync My Solves Now"** on their [Profile Dashboard](https://diwalichallenge.onrender.com/profile) every night to record problems solved that day.
-- **Daily Window**:
-  - Only questions solved and synced on that calendar day (since 12:00:00 AM IST) count towards your score.
-  - **Unsynced questions will NOT be considered.**
-- **Rate-Limiting Protection**:
-  - A 5-minute cooldown timer is enforced per participant to prevent platform API rate-limits and IP blocking.
-- **Automatic Midnight Rollover**:
-  - At midnight IST, the leaderboard daily counter automatically resets for the new day while preserving everyone's cumulative contest total.
+    subgraph Scrapers ["External Competitive Programming APIs"]
+        LC["LeetCode API<br/>(GraphQL recentAcSubmissionList)"]
+        CF["Codeforces API<br/>(REST + AbortSignal + Rating Filter >= 800)"]
+        CC["CodeChef Engine<br/>(Web Scraper + Problem Rating Cache)"]
+    end
 
----
+    subgraph Storage ["Persistence & Caching Layer"]
+        NeonDB[("Neon Serverless PostgreSQL<br/>(Prisma ORM • AWS Multi-AZ)")]
+        DiskCache[("Problem Rating Cache<br/>(In-Memory + Disk JSON)")]
+    end
 
-## 🏆 Leaderboard & Rewards
+    UI -->|Polls Standings every 30s| API_Lead
+    SyncBtn -->|POST Sync Request| API_Sync
+    BugModal -->|POST Bug Report| API_Bugs
 
-- **Live Standings**: Track individual solve counts per platform (`LC`, `CF`, `CC`), today's daily sprint count, and cumulative challenge solves.
-- **Podium Showcase**: Top 3 performers are displayed prominently in the golden Diwali podium.
-- **Exclusive Awards**: The **Top 3 performers** at the end of the 10-day challenge will be awarded exclusive prizes!
+    API_Sync --> ScraperEngine
+    ScraperEngine -->|GraphQL Query| LC
+    ScraperEngine -->|REST + Exponential Retry| CF
+    ScraperEngine -->|Cheerio Parser| CC
 
----
-
-## ⚖️ Code of Conduct
-
-- **Zero-Tolerance for Cheating**: Cheating, code plagiarism, or using multiple accounts is strictly prohibited.
-- **No Duplicate Submissions**: Submitting identical or copied code across accounts will lead to immediate disqualification.
-- **Fair Play**: Problem submissions must be authentic and verified on your linked competitive coding profiles.
-
----
-
-## 🛠️ Tech Stack & Architecture
-
-- **Frontend & App Framework**: [Next.js 14](https://nextjs.org/) (App Router), React, [Tailwind CSS](https://tailwindcss.com/), Lucide Icons
-- **Database & Storage**: [Neon Serverless PostgreSQL](https://neon.tech/) with [Prisma ORM](https://www.prisma.io/)
-  - Multi-AZ durability and continuous Write-Ahead Log (WAL) backups on AWS.
-  - Automated manual snapshots and point-in-time recovery (PITR).
-  - Stateless frontend compute on [Render](https://render.com/) decoupled from the database.
-- **Authentication**: Secure `bcryptjs` password hashing, HTTP-only signed JWT cookies.
-- **Scrapers & Trackers**:
-  - **LeetCode**: GraphQL `recentAcSubmissionList` query filtering unique AC slugs.
-  - **Codeforces**: Official REST API (`/api/user.status`) filtering `verdict === "OK"`.
-  - **CodeChef**: Live submissions scraper analyzing accepted 100-pt solutions since midnight IST.
+    CC <-->|Lookup / Persist Rating| DiskCache
+    API_Sync -->|Write Verified Solves| NeonDB
+    API_Lead -->|Query Ranked Standings| NeonDB
+    API_Admin <-->|Manage Users & Overwrites| NeonDB
+    API_Bugs -->|Save & Update Reports| NeonDB
+```
 
 ---
 
-## 📂 Project Structure
+## 💡 Key Engineering Challenges & Technical Solutions
+
+### 1. Scraper Resilience & Handling External Rate Limits
+* **The Problem**: Codeforces and CodeChef APIs frequently experience high peak-load latency (12–15s), Cloudflare Turnstile anti-bot gates, and 429/503 rate limits during international contests.
+* **The Solution**:
+  - Implemented client-specific retry handlers with `AbortSignal.timeout(22000)` and custom HTTP user-agent rotation.
+  - Enforced a per-user **5-minute cooldown (300 seconds)** on profile synchronization requests, preventing participants from bombarding external APIs.
+  - Implemented an **In-Memory & Persistent Disk Problem Rating Cache** (`data/codechef_ratings.json`) in [`lib/apis/codechef.ts`](lib/apis/codechef.ts). Once a problem rating is discovered, it is cached permanently so subsequent syncs for that problem avoid repeat HTTP roundtrips.
+
+### 2. Fair-Play Anti-Cheat: The $\ge 800$ Difficulty Rating Cutoff
+* **The Problem**: In open coding challenges, participants can farm trivial problems (e.g. 100-rating "Hello World" exercises) to artificially inflate their standing without demonstrating real algorithmic skill.
+* **The Solution**:
+  - Established a strict platform-wide quality rule: **only questions with a difficulty rating $\ge 800$ qualify**.
+  - **Codeforces**: The scraper parses `sub.problem.rating` and discards any accepted submissions with ratings under 800 or unrated problems.
+  - **CodeChef**: Queries the CodeChef contest practice difficulty API, checks the numerical rating, and filters out problems below 800.
+  - Retroactively purged historical baseline solves under 800 to ensure absolute leaderboard parity across all days.
+
+### 3. Cross-Timezone Midnight Rollover (UTC Server vs. IST Contest)
+* **The Problem**: The production application runs on cloud infrastructure (Render / AWS) whose system clocks run in UTC (`00:00:00 UTC`), while the challenge operates strictly in Indian Standard Time (`Asia/Kolkata`, UTC+05:30). Naive `new Date().setHours(0,0,0,0)` triggers daily rollovers at 5:30 AM IST instead of midnight, causing participant outrage.
+* **The Solution**:
+  - Engineered [`lib/date.ts`](lib/date.ts) using `Intl.DateTimeFormat` with explicit `Asia/Kolkata` timezone bindings.
+  - Designed `getStartOfTodayTimestamp()` to construct exact IST midnight timestamps (`YYYY-MM-DDT00:00:00+05:30`), guaranteeing accurate day boundaries regardless of host server location.
+  - Daily counters automatically reset for the new sprint while preserving each coder's cumulative contest total.
+
+### 4. Zero-Flash Dual Theme Engine (Festive Dark & Golden Ivory Light)
+* **The Problem**: Switching between dark mode and light mode often produces an unsightly jarring flash of white/black during server-side hydration (FOUC).
+* **The Solution**:
+  - Designed a custom synchronous inline script executed in `<head>` before the DOM renders, immediately applying `localStorage.getItem('gdg_theme')`.
+  - Rather than a generic, sterile black/white palette, developed a **Festive Golden Ivory Light Theme** (`#faf6f0` warm ivory background, `#ffffff` card surfaces, `#ebdccb` amber borders, and `#1e150e` espresso typography) alongside the traditional Diwali terracotta glow.
+
+### 5. Production Observability & Superuser Control Portal
+* **The Problem**: Real-time events require organizers to immediately troubleshoot sync issues, audit participant claims, and respond to platform bugs without direct database access.
+* **The Solution**:
+  - Built a secure role-based **Admin Control Center** (`/admin`) protected by signed JWT tokens and Argon/bcrypt credentials.
+  - **Live Participant Management**: Force-sync individual coders (bypassing cooldowns), search and filter across handles, and manually overwrite scores with full audit records.
+  - **Bug & Feedback Triage Desk**: Integrated in-app bug reporting modal and full-page `/report-bug` view where participants report scoring discrepancies. Incoming reports land directly in the Admin portal with status tags (`Open`, `In Progress`, `Resolved`) and admin notes.
+
+---
+
+## 🛠️ Complete Tech Stack
+
+| Domain | Technologies Used |
+| :--- | :--- |
+| **Frontend Framework** | [Next.js 14](https://nextjs.org/) (App Router, Server & Client Components) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) (Strict mode, end-to-end type safety) |
+| **Styling & Design** | [Tailwind CSS](https://tailwindcss.com/), Lucide Icons, Custom Diwali CSS Animations |
+| **Database & ORM** | [Neon Serverless PostgreSQL](https://neon.tech/) with [Prisma ORM](https://www.prisma.io/) |
+| **Connection Pooling** | Prisma Client global singleton with unpooled migration compatibility |
+| **Authentication** | JSON Web Tokens (JWT), HTTP-only secure cookies, `bcryptjs` hashing |
+| **Web Scraping** | [Axios](https://axios-http.com/), [Cheerio](https://cheerio.js.org/), Native Fetch with AbortController |
+| **Deployment & Hosting** | [Render](https://render.com/) (Web Service), Neon (Cloud PostgreSQL, AWS ap-southeast-1) |
+
+---
+
+## 📂 Project Architecture & Directory Map
 
 ```
 coding-leaderboard/
 ├── app/
+│   ├── admin/page.tsx                # Superuser Control Portal & Bug Triage Desk
 │   ├── api/
-│   │   ├── auth/
-│   │   │   ├── register/route.ts     # User registration (college BT ID)
-│   │   │   ├── login/route.ts        # Authentication & JWT session
-│   │   │   ├── me/route.ts           # Current authenticated user
-│   │   │   └── logout/route.ts       # Session termination
-│   │   ├── leaderboard/route.ts      # Live ranked standings API
-│   │   ├── sync/route.ts             # Per-user solve synchronization (5m cooldown)
-│   │   └── profile/route.ts          # Handle linking & immediate recalibration
-│   ├── developer/page.tsx            # Solo architect & developer credits
-│   ├── login/page.tsx                # Sign In page (with password visibility toggle)
-│   ├── register/page.tsx             # Sign Up page (with password visibility toggle)
-│   ├── profile/page.tsx              # User dashboard & manual sync center
-│   ├── globals.css                   # Festive dark theme & radiant Diya glow
-│   ├── layout.tsx                    # Root layout with header, footer & nav
-│   └── page.tsx                      # Main Leaderboard, Podium & live metrics
+│   │   ├── admin/                    # Admin auth, user overwrites, and force-sync APIs
+│   │   ├── auth/                     # Register, Login, Me, and Logout endpoints
+│   │   ├── bugs/                     # Bug report submission, triage, and patch APIs
+│   │   ├── leaderboard/              # Ranked standings API (no-cache headers)
+│   │   ├── sync/                     # Per-user solve synchronizer (5m cooldown gate)
+│   │   └── views/                    # Real-time unique page view telemetry
+│   ├── developer/page.tsx            # Solo architect credit & social connections
+│   ├── login/page.tsx                # Participant authentication portal
+│   ├── register/page.tsx             # New coder enrollment (college BT ID)
+│   ├── profile/page.tsx              # Participant dashboard & manual sync center
+│   ├── report-bug/page.tsx           # Dedicated bug & scoring discrepancy desk
+│   ├── globals.css                   # Custom Light/Dark theme styles & Diya animations
+│   ├── layout.tsx                    # Root layout with zero-flash theme head script
+│   └── page.tsx                      # Main Leaderboard, Podium, and live challenge metrics
 ├── components/
-│   ├── Navbar.tsx                    # Sticky branding navbar with GDG logo
-│   ├── Podium.tsx                    # Top 3 medalists showcase
-│   ├── LeaderboardTable.tsx          # Searchable, platform-filterable table
-│   ├── PlatformBadge.tsx             # Verified platform handles & counts
-│   └── DiyaBackground.tsx            # Luminous festive Diwali terracotta Diyas
+│   ├── BugReportModal.tsx            # Global interactive bug report dialog
+│   ├── BugReportForm.tsx             # Reusable bug report form with category selector
+│   ├── DailySyncWidget.tsx           # Countdown timer & daily sync status indicator
+│   ├── DailySyncReminderBanner.tsx   # Urgent reminder banner for unsynced solves
+│   ├── DiyaBackground.tsx            # Festive Diwali terracotta flame graphics
+│   ├── LeaderboardTable.tsx          # Real-time searchable & platform-filterable table
+│   ├── Navbar.tsx                    # Navigation bar with ThemeToggle & Report Bug action
+│   ├── PlatformBadge.tsx             # Verified LeetCode, Codeforces & CodeChef badges
+│   ├── Podium.tsx                    # Animated gold, silver, bronze top-3 showcase
+│   ├── ThemeProvider.tsx             # React theme context & localStorage synchronization
+│   └── ThemeToggle.tsx               # Sun / Moon theme toggle button
 ├── lib/
 │   ├── apis/
 │   │   ├── leetcode.ts               # LeetCode GraphQL fetcher
-│   │   ├── codeforces.ts             # Codeforces REST API fetcher
-│   │   ├── codechef.ts               # CodeChef accepted submissions parser
+│   │   ├── codeforces.ts             # Codeforces REST fetcher with timeout & rating filter
+│   │   ├── codechef.ts               # CodeChef accepted solution scraper & disk rating cache
 │   │   └── tracker.ts                # Multi-platform synchronization engine
-│   ├── auth.ts                       # Password hashing & JWT helpers
-│   ├── date.ts                       # Asia/Kolkata timezone & midnight calculators
-│   ├── db.ts                         # Neon PostgreSQL database interface
-│   └── prisma.ts                     # Prisma client instance
+│   ├── adminAuth.ts                  # Admin token signing and verification
+│   ├── auth.ts                       # Participant session auth & password hashing
+│   ├── date.ts                       # Asia/Kolkata timezone & midnight timestamp engine
+│   ├── db.ts                         # Neon PostgreSQL data access with local fallback
+│   └── prisma.ts                     # Prisma Client singleton
 ├── prisma/
-│   └── schema.prisma                 # PostgreSQL data models & indexes
-├── public/
-│   └── images/                       # Festive graphics & profile assets
-├── tailwind.config.js                # Custom Diwali amber/orange palette
+│   └── schema.prisma                 # User, GlobalMeta, and BugReport schema definitions
+├── data/
+│   ├── codechef_ratings.json         # Persistent problem difficulty rating cache
+│   └── db.json                       # Zero-downtime offline storage fallback
 └── package.json
 ```
 
 ---
 
-## 🚀 Local Development Setup
+## 🚀 Local Setup & Installation
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/adiscripts03/DiwaliChallenge.git
-   cd DiwaliChallenge
-   ```
+### 1. Prerequisites
+- **Node.js**: v18.17.0 or higher
+- **Package Manager**: npm or yarn
+- **PostgreSQL**: Local instance or free [Neon](https://neon.tech/) connection URI
 
-2. **Install dependencies**:
-   ```bash
-   npm install
-   ```
+### 2. Clone & Install
+```bash
+git clone https://github.com/adiscripts03/DiwaliChallenge.git
+cd DiwaliChallenge
+npm install
+```
 
-3. **Configure environment variables**:
-   Create a `.env` file:
-   ```env
-   DATABASE_URL="postgresql://neondb_owner:...@ep-...neon.tech/neondb?sslmode=require"
-   JWT_SECRET="your_secure_jwt_secret"
-   NEXT_PUBLIC_TIMEZONE="Asia/Kolkata"
-   ```
+### 3. Configure Environment Variables
+Create a `.env` file in the project root:
+```env
+# Neon PostgreSQL Database Connection
+DATABASE_URL="postgresql://<user>:<password>@<host>.neon.tech/neondb?sslmode=require"
+DATABASE_URL_UNPOOLED="postgresql://<user>:<password>@<host>.neon.tech/neondb?sslmode=require"
 
-4. **Initialize Prisma Client**:
-   ```bash
-   npx prisma generate
-   ```
+# Security & Sessions
+JWT_SECRET="generate_a_random_secure_secret_key"
+ADMIN_ID="admin"
+ADMIN_PASSWORD="your_admin_portal_password"
 
-5. **Start the local dev server**:
-   ```bash
-   npm run dev
-   ```
-   Open [http://localhost:3000](http://localhost:3000) in your browser.
+# Challenge Configuration
+NEXT_PUBLIC_TIMEZONE="Asia/Kolkata"
+NEXT_PUBLIC_ADMIN_EMAIL="mejustaditya03@gmail.com"
+```
+
+### 4. Database Setup & Prisma Generation
+```bash
+npx prisma generate
+```
+
+### 5. Run Development Server
+```bash
+npm run dev
+```
+Navigate to [http://localhost:3000](http://localhost:3000) to view the live dashboard.
 
 ---
 
-## 👨‍💻 Developer & Team
+## 🏆 Contest Rules & Platform Verification
 
-Built with ❤️ by the **Website Team** (**Aditya Singh**).
+1. **Daily Sync Deadline**: Participants must click **"Sync My Solves Now"** on their profile before **11:59:59 PM IST** each night.
+2. **Platform Scraper Verification**:
+   - **LeetCode**: Accepted submissions (`status === "Accepted"`) via GraphQL API.
+   - **Codeforces**: Accepted submissions (`verdict === "OK"`) with difficulty rating $\ge 800$.
+   - **CodeChef**: Fully accepted 100-point solutions with difficulty rating $\ge 800$.
+3. **Anti-Plagiarism**: Disqualification is automatically enforced for duplicate accounts or identical code submissions across different participants.
 
-- **GitHub**: [@adiscripts03](https://github.com/adiscripts03)
-- **LinkedIn**: [Aditya Singh](https://www.linkedin.com/in/aditya-singh-80827935a/)
-- **Live Leaderboard**: [https://diwalichallenge.onrender.com/](https://diwalichallenge.onrender.com/)
+---
+
+## 👨‍💻 Solo Architect & Developer
+
+**Aditya Singh**  
+*Solo Developer & Architect behind the GDG Diwali Challenge Platform*
+
+* 🌐 **Live Platform**: [diwalichallenge.onrender.com](https://diwalichallenge.onrender.com/)
+* 💼 **LinkedIn**: [linkedin.com/in/aditya-singh-80827935a/](https://www.linkedin.com/in/aditya-singh-80827935a/)
+* 🐙 **GitHub**: [@adiscripts03](https://github.com/adiscripts03)
+
+---
+
+*Organized in collaboration with Google Developer Groups (GDG) On Campus IIITN.*
