@@ -107,22 +107,6 @@ export default function BugReportModal({ isOpen, onClose, defaultCategory = 'sol
   };
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'mejustaditya03@gmail.com';
-  const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || '';
-
-  const constructWhatsAppUrl = () => {
-    const text = encodeURIComponent(
-      `*GDG Diwali Challenge - Bug Report*\n` +
-      `*From:* ${userName || 'A Coder'}\n` +
-      `*Category:* ${category}\n` +
-      `*Handle:* ${coderHandle || 'N/A'}\n\n` +
-      `*Details:*\n${message}`
-    );
-    if (adminWhatsApp) {
-      const cleanPhone = adminWhatsApp.replace(/[^0-9]/g, '');
-      return `https://wa.me/${cleanPhone}?text=${text}`;
-    }
-    return `https://wa.me/?text=${text}`;
-  };
 
   const constructMailtoUrl = () => {
     const subject = encodeURIComponent(`[Bug Report] GDG Diwali Challenge - ${category.toUpperCase()}`);
@@ -194,25 +178,15 @@ export default function BugReportModal({ isOpen, onClose, defaultCategory = 'sol
               {/* Quick direct-message options */}
               <div className="pt-4 border-t border-slate-800/80 space-y-3">
                 <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  Want an instant reply? Ping Aditya directly:
+                  Want to follow up directly?
                 </p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-md mx-auto">
-                  <a
-                    href={constructWhatsAppUrl()}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center justify-center space-x-2 px-4 py-3 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-bold text-xs transition-all hover:scale-[1.02] shadow-lg"
-                  >
-                    <MessageSquare className="w-4 h-4 text-emerald-400" />
-                    <span>Open in WhatsApp</span>
-                  </a>
-
+                <div className="max-w-xs mx-auto">
                   <a
                     href={constructMailtoUrl()}
                     className="flex items-center justify-center space-x-2 px-4 py-3 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-xs transition-all hover:scale-[1.02] shadow-lg"
                   >
                     <Mail className="w-4 h-4 text-amber-400" />
-                    <span>Send via Email</span>
+                    <span>Send Direct Email to Aditya</span>
                   </a>
                 </div>
               </div>
@@ -321,13 +295,13 @@ export default function BugReportModal({ isOpen, onClose, defaultCategory = 'sol
               <div>
                 <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1 flex items-center gap-1.5">
                   <AtSign className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Email / WhatsApp (Optional, for updates)</span>
+                  <span>Your Email (Optional, for fix updates)</span>
                 </label>
                 <input
                   type="text"
                   value={userEmail}
                   onChange={(e) => setUserEmail(e.target.value)}
-                  placeholder="your.email@example.com or phone"
+                  placeholder="your.email@example.com"
                   className="w-full bg-slate-950/90 border border-slate-700 rounded-xl px-3.5 py-2 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400"
                 />
               </div>
@@ -368,3 +342,4 @@ export default function BugReportModal({ isOpen, onClose, defaultCategory = 'sol
     </div>
   );
 }
+

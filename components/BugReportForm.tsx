@@ -95,22 +95,6 @@ export default function BugReportForm() {
   };
 
   const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'mejustaditya03@gmail.com';
-  const adminWhatsApp = process.env.NEXT_PUBLIC_ADMIN_WHATSAPP || '';
-
-  const constructWhatsAppUrl = () => {
-    const text = encodeURIComponent(
-      `*GDG Diwali Challenge - Bug Report*\n` +
-      `*From:* ${userName || 'A Coder'}\n` +
-      `*Category:* ${category}\n` +
-      `*Handle:* ${coderHandle || 'N/A'}\n\n` +
-      `*Details:*\n${message}`
-    );
-    if (adminWhatsApp) {
-      const cleanPhone = adminWhatsApp.replace(/[^0-9]/g, '');
-      return `https://wa.me/${cleanPhone}?text=${text}`;
-    }
-    return `https://wa.me/?text=${text}`;
-  };
 
   const constructMailtoUrl = () => {
     const subject = encodeURIComponent(`[Bug Report] GDG Diwali Challenge - ${category.toUpperCase()}`);
@@ -147,30 +131,18 @@ export default function BugReportForm() {
           </div>
         </div>
 
-        {/* Quick direct communication buttons */}
-        <div className="pt-6 border-t border-slate-800 max-w-xl mx-auto space-y-3">
+        {/* Quick direct communication button */}
+        <div className="pt-6 border-t border-slate-800 max-w-md mx-auto space-y-3">
           <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">
-            Want to follow up or chat in real-time?
+            Want to follow up directly?
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a
-              href={constructWhatsAppUrl()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-2xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-500/40 text-emerald-300 font-bold text-sm transition-all hover:scale-[1.02] shadow-lg"
-            >
-              <MessageSquare className="w-5 h-5 text-emerald-400" />
-              <span>Ping on WhatsApp</span>
-            </a>
-
-            <a
-              href={constructMailtoUrl()}
-              className="flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-sm transition-all hover:scale-[1.02] shadow-lg"
-            >
-              <Mail className="w-5 h-5 text-amber-400" />
-              <span>Send via Email</span>
-            </a>
-          </div>
+          <a
+            href={constructMailtoUrl()}
+            className="flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-2xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/40 text-amber-300 font-bold text-sm transition-all hover:scale-[1.02] shadow-lg"
+          >
+            <Mail className="w-5 h-5 text-amber-400" />
+            <span>Send Direct Email to Aditya</span>
+          </a>
         </div>
 
         <div className="pt-4 flex items-center justify-center space-x-4">
@@ -288,13 +260,13 @@ export default function BugReportForm() {
         <div>
           <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
             <AtSign className="w-3.5 h-3.5 text-slate-400" />
-            <span>Email / WhatsApp (Optional)</span>
+            <span>Your Email (Optional)</span>
           </label>
           <input
             type="text"
             value={userEmail}
             onChange={(e) => setUserEmail(e.target.value)}
-            placeholder="For fix updates"
+            placeholder="your.email@example.com"
             className="w-full bg-slate-950/90 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400"
           />
         </div>
@@ -323,3 +295,4 @@ export default function BugReportForm() {
     </form>
   );
 }
+
