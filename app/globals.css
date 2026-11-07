@@ -23,6 +23,28 @@ body {
   transition: background-color 0.25s ease, color 0.25s ease;
 }
 
+/* ========================================================
+   Smooth Radial/Circular Wipe Transition for Theme Toggle
+   Originating from top-right Sun/Moon button to bottom-left
+   ======================================================== */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none !important;
+  mix-blend-mode: normal !important;
+}
+
+::view-transition-old(root) {
+  z-index: 1 !important;
+}
+
+::view-transition-new(root) {
+  z-index: 99999 !important;
+}
+
+::view-transition-image-pair(root) {
+  isolation: isolate;
+}
+
 /* Tabular nums for metric numbers */
 .tabular-numbers {
   font-variant-numeric: tabular-nums;

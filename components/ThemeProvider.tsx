@@ -6,7 +6,7 @@ export type Theme = 'dark' | 'light';
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  toggleTheme: (e?: React.MouseEvent) => void;
   setTheme: (theme: Theme) => void;
 }
 
@@ -59,9 +59,65 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   };
 
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark';
-    setTheme(next);
+  const toggleTheme = (e?: React.MouseEvent) => {
+    const next: Theme = theme === 'dark' ? 'light' : 'dark';
+
+    // Check if View Transitions API is supported and user hasn't requested reduced motion
+    const canAnimate =
+      typeof document !== 'undefined' &&
+      typeof (document as any).startViewTransition === 'function' &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (!canAnimate) {
+      setTheme(next);
+      return;
+    }
+
+    // Default origin: top-right corner if no event target is available
+    let x = typeof window !== 'undefined' ? window.innerWidth - 40 : 0;
+    let y = 30;
+
+    if (e) {
+      const target = (e.currentTarget || e.target) as HTMLElement;
+      if (target?.getBoundingClientRect) {
+        const rect = target.getBoundingClientRect();
+        x = rect.left + rect.width / 2;
+        y = rect.top + rect.height / 2;
+      } else if (e.clientX !== undefined && e.clientY !== undefined) {
+        x = e.clientX;
+        y = e.clientY;
+      }
+    }
+
+    // Calculate distance to the farthest corner (usually bottom-left)
+    const endRadius = Math.hypot(
+      Math.max(x, window.innerWidth - x),
+      Math.max(y, window.innerHeight - y)
+    );
+
+    const transition = (document as any).startViewTransition(() => {
+      setTheme(next);
+    });
+
+    transition.ready
+      .then(() => {
+        const clipPath = [
+          `circle(0px at ${x}px ${y}px)`,
+          `circle(${endRadius}px at ${x}px ${y}px)`,
+        ];
+
+        document.documentElement.animate(
+          {
+            clipPath,
+          },
+          {
+            duration: 550,
+            easing: 'cubic-bezier(0.4, 0, 0.2, 1)',
+            pseudoElement: '::view-transition-new(root)',
+          }
+        );
+      })
+      .catch(() => {});
   };
 
   return (
