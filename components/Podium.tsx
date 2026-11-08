@@ -41,16 +41,19 @@ function renderUserBadges(user: LeaderboardUser) {
         platform="leetcode"
         handle={user.handles?.leetcode}
         count={user.stats?.leetcode || 0}
+        showHandle={false}
       />
       <PlatformBadge
         platform="codeforces"
         handle={user.handles?.codeforces}
         count={user.stats?.codeforces || 0}
+        showHandle={false}
       />
       <PlatformBadge
         platform="codechef"
         handle={user.handles?.codechef}
         count={user.stats?.codechef || 0}
+        showHandle={false}
       />
     </>
   );
