@@ -7,6 +7,7 @@ import DiyaBackground from '@/components/DiyaBackground';
 import FooterViewCounter from '@/components/FooterViewCounter';
 import DiwaliGreetingAnimation from '@/components/DiwaliGreetingAnimation';
 import { ThemeProvider } from '@/components/ThemeProvider';
+import FloatingBugReportButton from '@/components/FloatingBugReportButton';
 
 export const metadata: Metadata = {
   title: 'GDG Diwali Challenge | Competitive Programming Leaderboard',
@@ -74,6 +75,7 @@ export default function RootLayout({
               </div>
             </footer>
           </div>
+          <FloatingBugReportButton />
         </ThemeProvider>
       </body>
     </html>
