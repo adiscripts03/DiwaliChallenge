@@ -7,7 +7,7 @@ import DiyaBackground from '@/components/DiyaBackground';
 import FooterViewCounter from '@/components/FooterViewCounter';
 import DiwaliGreetingAnimation from '@/components/DiwaliGreetingAnimation';
 import { ThemeProvider } from '@/components/ThemeProvider';
-import FloatingBugReportButton from '@/components/FloatingBugReportButton';
+import BugReportButton from '@/components/BugReportButton';
 
 export const metadata: Metadata = {
   title: 'GDG Diwali Challenge | Competitive Programming Leaderboard',
@@ -56,13 +56,13 @@ export default function RootLayout({
           <div className="relative z-10 flex flex-col min-h-screen">
             <Navbar />
             <DailySyncReminderBanner />
-            <main className="flex-1 w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 py-8">
+            <main className="flex-1 w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 py-8 pb-12 sm:pb-16">
               {children}
             </main>
-            <footer className="border-t border-slate-800/80 py-8 text-center text-xs text-slate-400">
-              <div className="flex flex-col items-center justify-center gap-3">
-                <FooterViewCounter />
-                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-slate-400">
+            <footer className="footer-container border-t border-slate-800/80 py-6 sm:py-8 text-xs text-slate-400 transition-colors">
+              <div className="w-full max-w-[1760px] mx-auto px-4 sm:px-6 lg:px-10 flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6">
+                {/* Left: Copyright & Developer Link */}
+                <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-slate-400 order-2 sm:order-1 text-center sm:text-left">
                   <span>© {new Date().getFullYear()} GDG Diwali Challenge.</span>
                   <span className="hidden sm:inline text-slate-600">•</span>
                   <Link
@@ -72,10 +72,19 @@ export default function RootLayout({
                     Meet the Man Behind
                   </Link>
                 </div>
+
+                {/* Center: Live FooterViewCounter */}
+                <div className="order-3 sm:order-2">
+                  <FooterViewCounter />
+                </div>
+
+                {/* Right: Bug Report Button (Bottom Right) */}
+                <div className="order-1 sm:order-3 flex items-center justify-center sm:justify-end">
+                  <BugReportButton />
+                </div>
               </div>
             </footer>
           </div>
-          <FloatingBugReportButton />
         </ThemeProvider>
       </body>
     </html>

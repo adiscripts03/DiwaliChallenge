@@ -501,35 +501,40 @@ html.light .bug-banner-card {
 }
 
 /* ========================================================
-   Floating Bug Report Button (Bottom Right)
+   Bug Report Button (Bottom Right)
    ======================================================== */
+.bug-report-btn,
 .floating-bug-btn {
   background-color: rgba(24, 18, 12, 0.92);
   border: 1px solid rgba(245, 158, 11, 0.35);
   color: #fbbf24;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(245, 158, 11, 0.12);
+  box-shadow: 0 6px 20px -3px rgba(0, 0, 0, 0.6), 0 0 15px rgba(245, 158, 11, 0.12);
 }
 
+.bug-report-btn:hover,
 .floating-bug-btn:hover {
   border-color: rgba(245, 158, 11, 0.65);
   color: #ffffff;
-  box-shadow: 0 12px 28px -4px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.25);
+  box-shadow: 0 8px 24px -3px rgba(0, 0, 0, 0.7), 0 0 20px rgba(245, 158, 11, 0.25);
 }
 
-/* Light Mode Floating Bug Button */
+/* Light Mode Bug Report Button */
+html.light .bug-report-btn,
 html.light .floating-bug-btn {
-  background-color: rgba(255, 255, 255, 0.95) !important;
+  background-color: #ffffff !important;
   border-color: #ebdccb !important;
   color: #b45309 !important;
-  box-shadow: 0 10px 25px -5px rgba(180, 83, 9, 0.15), 0 0 0 1px #ecd2b0 !important;
+  box-shadow: 0 6px 20px -3px rgba(180, 83, 9, 0.15), 0 0 0 1px #ecd2b0 !important;
 }
 
+html.light .bug-report-btn:hover,
 html.light .floating-bug-btn:hover {
   border-color: #d97706 !important;
   color: #92400e !important;
-  box-shadow: 0 14px 30px -4px rgba(180, 83, 9, 0.22), 0 0 0 1px #d97706 !important;
+  box-shadow: 0 8px 24px -3px rgba(180, 83, 9, 0.22), 0 0 0 1px #d97706 !important;
 }
 
+html.light .bug-report-btn span.w-6,
 html.light .floating-bug-btn span.w-6 {
   background-color: #fef3c7 !important;
   border-color: #fcd34d !important;
