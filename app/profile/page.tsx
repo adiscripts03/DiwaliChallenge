@@ -2,13 +2,16 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Save, RefreshCw, CheckCircle2, AlertCircle, Flame, ExternalLink, Clock } from 'lucide-react';
+import { User, Save, RefreshCw, CheckCircle2, AlertCircle, Flame, ExternalLink, Clock, Trophy, Sparkles } from 'lucide-react';
 import PlatformBadge from '@/components/PlatformBadge';
+import RankCardModal from '@/components/RankCardModal';
 
 interface UserData {
   id: string;
   name: string;
   email: string;
+  rank?: number;
+  totalParticipants?: number;
   handles: {
     leetcode: string;
     codeforces: string;
@@ -36,6 +39,7 @@ export default function ProfilePage() {
   const [syncing, setSyncing] = useState(false);
   const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const [isCardModalOpen, setIsCardModalOpen] = useState(false);
 
   useEffect(() => {
     if (cooldownSeconds <= 0) return;
@@ -203,25 +207,36 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:items-end gap-2 w-full sm:w-auto">
-            <button
-              onClick={handleSyncNow}
-              disabled={syncing || cooldownSeconds > 0}
-              className={`flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-lg transition-all ${
-                syncing || cooldownSeconds > 0
-                  ? 'bg-amber-500/20 text-amber-300/60 border border-amber-500/20 cursor-not-allowed'
-                  : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 hover:scale-[1.02]'
-              }`}
-            >
-              <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-              <span>
-                {syncing
-                  ? 'Fetching from APIs...'
-                  : cooldownSeconds > 0
-                  ? `Wait ${Math.floor(cooldownSeconds / 60)}m ${cooldownSeconds % 60}s to sync`
-                  : 'Sync My Solves Now'}
-              </span>
-            </button>
+          <div className="flex flex-col sm:items-end gap-3 w-full sm:w-auto">
+            <div className="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto">
+              <button
+                onClick={() => setIsCardModalOpen(true)}
+                type="button"
+                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-3.5 rounded-xl font-black text-sm sm:text-base bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95"
+              >
+                <Trophy className="w-4 h-4 text-slate-950 shrink-0" />
+                <span>Rank Card</span>
+              </button>
+
+              <button
+                onClick={handleSyncNow}
+                disabled={syncing || cooldownSeconds > 0}
+                className={`w-full sm:w-auto flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-lg transition-all ${
+                  syncing || cooldownSeconds > 0
+                    ? 'bg-amber-500/20 text-amber-300/60 border border-amber-500/20 cursor-not-allowed'
+                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 hover:scale-[1.02]'
+                }`}
+              >
+                <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
+                <span>
+                  {syncing
+                    ? 'Fetching from APIs...'
+                    : cooldownSeconds > 0
+                    ? `Wait ${Math.floor(cooldownSeconds / 60)}m ${cooldownSeconds % 60}s to sync`
+                    : 'Sync My Solves Now'}
+                </span>
+              </button>
+            </div>
             <div className="text-xs sm:text-sm text-amber-400/80 flex items-center justify-center sm:justify-end gap-1.5 font-medium">
               <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
               <span>Sync cutoff is 11:59 PM IST tonight</span>
@@ -294,6 +309,32 @@ export default function ProfilePage() {
               {user.handles?.codechef?.trim() ? 'Rating ≥ 800' : 'Profile not set'}
             </div>
           </div>
+        </div>
+
+        {/* LinkedIn Shareable Rank Card & Certificate Banner */}
+        <div className="mt-8 relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/15 via-orange-600/15 to-amber-500/10 border-2 border-amber-500/40 p-6 sm:p-8 backdrop-blur-md shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div className="space-y-2 max-w-2xl">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider">
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>LinkedIn Shareable Achievement</span>
+            </div>
+            <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
+              <span>Generate Your Rank Card & Certificate</span>
+            </h3>
+            <p className="text-sm sm:text-base text-amber-100/80 leading-relaxed">
+              Export your official Codolio-style Rank Card or GDG IIITN Certificate of Merit. 
+              Showcase your verified problem solves on LeetCode, Codeforces, and CodeChef to recruiters and peers on LinkedIn!
+            </p>
+          </div>
+
+          <button
+            onClick={() => setIsCardModalOpen(true)}
+            type="button"
+            className="flex items-center justify-center space-x-2.5 px-7 py-4 rounded-2xl font-black text-base bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-xl shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 shrink-0"
+          >
+            <Trophy className="w-5 h-5 text-slate-950" />
+            <span>Generate Rank Card</span>
+          </button>
         </div>
       </div>
 
@@ -397,6 +438,13 @@ export default function ProfilePage() {
           </div>
         </form>
       </div>
+
+      {/* Shareable Rank Card & Certificate Modal */}
+      <RankCardModal
+        isOpen={isCardModalOpen}
+        onClose={() => setIsCardModalOpen(false)}
+        user={user}
+      />
     </div>
   );
 }

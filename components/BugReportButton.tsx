@@ -31,3 +31,4 @@ export default function BugReportButton({ className = '', variant = 'footer' }: 
     </>
   );
 }
+
