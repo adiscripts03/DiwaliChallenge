@@ -132,6 +132,8 @@ function hasPostgresUrl(): boolean {
  */
 async function resetDailyStatsIfNewDay(todayDateStr: string) {
   if (!hasPostgresUrl()) return;
+  // The GDG Diwali Challenge officially concluded on Nov 12, 2026. Standings & stats are frozen.
+  if (todayDateStr > '2026-11-12') return;
   try {
     await prisma.user.updateMany({
       where: {
@@ -175,9 +177,9 @@ export const db = {
             stats: {
               totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
               todaySolved: isToday ? u.todaySolved : 0,
-              leetcode: isToday ? u.solvedLc : 0,
-              codeforces: isToday ? u.solvedCf : 0,
-              codechef: isToday ? u.solvedCc : 0,
+              leetcode: u.solvedLc ?? 0,
+              codeforces: u.solvedCf ?? 0,
+              codechef: u.solvedCc ?? 0,
               lastUpdated: u.lastUpdated.toISOString(),
             },
             lastDailyDate: u.lastDailyDate,
@@ -197,9 +199,9 @@ export const db = {
         stats: {
           ...u.stats,
           todaySolved: isToday ? u.stats.todaySolved : 0,
-          leetcode: isToday ? u.stats.leetcode : 0,
-          codeforces: isToday ? u.stats.codeforces : 0,
-          codechef: isToday ? u.stats.codechef : 0,
+          leetcode: u.stats.leetcode || 0,
+          codeforces: u.stats.codeforces || 0,
+          codechef: u.stats.codechef || 0,
         },
       };
     });
@@ -226,9 +228,9 @@ export const db = {
             stats: {
               totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
               todaySolved: isToday ? u.todaySolved : 0,
-              leetcode: isToday ? u.solvedLc : 0,
-              codeforces: isToday ? u.solvedCf : 0,
-              codechef: isToday ? u.solvedCc : 0,
+              leetcode: u.solvedLc ?? 0,
+              codeforces: u.solvedCf ?? 0,
+              codechef: u.solvedCc ?? 0,
               lastUpdated: u.lastUpdated.toISOString(),
             },
             lastDailyDate: u.lastDailyDate,
@@ -249,9 +251,9 @@ export const db = {
       stats: {
         ...u.stats,
         todaySolved: isToday ? u.stats.todaySolved : 0,
-        leetcode: isToday ? u.stats.leetcode : 0,
-        codeforces: isToday ? u.stats.codeforces : 0,
-        codechef: isToday ? u.stats.codechef : 0,
+        leetcode: u.stats.leetcode || 0,
+        codeforces: u.stats.codeforces || 0,
+        codechef: u.stats.codechef || 0,
       },
     };
   },
@@ -279,9 +281,9 @@ export const db = {
             stats: {
               totalSolved: u.totalSolved ?? u.todaySolved ?? 0,
               todaySolved: isToday ? u.todaySolved : 0,
-              leetcode: isToday ? u.solvedLc : 0,
-              codeforces: isToday ? u.solvedCf : 0,
-              codechef: isToday ? u.solvedCc : 0,
+              leetcode: u.solvedLc ?? 0,
+              codeforces: u.solvedCf ?? 0,
+              codechef: u.solvedCc ?? 0,
               lastUpdated: u.lastUpdated.toISOString(),
             },
             lastDailyDate: u.lastDailyDate,
@@ -302,9 +304,9 @@ export const db = {
       stats: {
         ...u.stats,
         todaySolved: isToday ? u.stats.todaySolved : 0,
-        leetcode: isToday ? u.stats.leetcode : 0,
-        codeforces: isToday ? u.stats.codeforces : 0,
-        codechef: isToday ? u.stats.codechef : 0,
+        leetcode: u.stats.leetcode || 0,
+        codeforces: u.stats.codeforces || 0,
+        codechef: u.stats.codechef || 0,
       },
     };
   },
