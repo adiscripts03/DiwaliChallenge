@@ -311,7 +311,7 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* LinkedIn Shareable Rank Card & Certificate Banner */}
+        {/* LinkedIn Shareable Rank Card Banner */}
         <div className="mt-8 relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/15 via-orange-600/15 to-amber-500/10 border-2 border-amber-500/40 p-6 sm:p-8 backdrop-blur-md shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider">
@@ -319,18 +319,17 @@ export default function ProfilePage() {
               <span>LinkedIn Shareable Achievement</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
-              <span>Generate Your Rank Card & Certificate</span>
+              <span>Generate Your Rank Card</span>
             </h3>
             <p className="text-sm sm:text-base text-amber-100/80 leading-relaxed">
-              Export your official Codolio-style Rank Card or GDG IIITN Certificate of Merit. 
-              Showcase your verified problem solves on LeetCode, Codeforces, and CodeChef to recruiters and peers on LinkedIn!
+              Export your official GDG IIITN Rank Card! Showcase your final rank after the challenge, along with verified question counts on LeetCode, Codeforces, and CodeChef to recruiters and peers on LinkedIn.
             </p>
           </div>
 
           <button
             onClick={() => setIsCardModalOpen(true)}
             type="button"
-            className="flex items-center justify-center space-x-2.5 px-7 py-4 rounded-2xl font-black text-base bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-xl shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 shrink-0"
+            className="flex items-center justify-center space-x-2.5 px-7 py-4 rounded-2xl font-black text-base bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-xl shadow-amber-500/30 transition-all hover:scale-105 active:scale-95 shrink-0 cursor-pointer"
           >
             <Trophy className="w-5 h-5 text-slate-950" />
             <span>Generate Rank Card</span>
@@ -439,7 +438,7 @@ export default function ProfilePage() {
         </form>
       </div>
 
-      {/* Shareable Rank Card & Certificate Modal */}
+      {/* Shareable Rank Card Modal */}
       <RankCardModal
         isOpen={isCardModalOpen}
         onClose={() => setIsCardModalOpen(false)}
