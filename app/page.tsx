@@ -8,7 +8,7 @@ import Podium from '@/components/Podium';
 import LeaderboardTable, { LeaderboardUser } from '@/components/LeaderboardTable';
 import DailySyncWidget from '@/components/DailySyncWidget';
 import { DiyaGraphic } from '@/components/DiyaBackground';
-import { RefreshCw, Users, Flame, Sparkles } from 'lucide-react';
+import { RefreshCw, Users, Flame, Sparkles, CheckCircle2, Trophy, Heart } from 'lucide-react';
 
 export default function HomePage() {
   const [users, setUsers] = useState<LeaderboardUser[]>([]);
@@ -34,12 +34,6 @@ export default function HomePage() {
 
   useEffect(() => {
     fetchLeaderboard();
-
-    // Auto-refresh leaderboard every 30 seconds so other users' solves show live
-    const interval = setInterval(() => {
-      fetchLeaderboard();
-    }, 30000);
-    return () => clearInterval(interval);
   }, []);
 
   // Calculations
@@ -56,15 +50,15 @@ export default function HomePage() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div>
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-xs font-semibold mb-3">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Diwali Vacation Long Challenge</span>
+            <div className="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-xs font-bold mb-3 shadow-sm">
+              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <span>Challenge Concluded • Final Official Standings</span>
             </div>
             <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white text-balance">
               GDG Diwali <span className="text-amber-400">Challenge</span>
             </h1>
             <p className="mt-2 text-amber-100/80 text-sm sm:text-base max-w-3xl text-pretty">
-              Vacation long coding sprint for freshers! Tracking all verified problems solved during the Diwali vacation. Top 3 coders at the end of vacation will be awarded!
+              The 10-day Diwali Vacation Coding Sprint has officially concluded! Final verified scores across LeetCode, Codeforces, and CodeChef are now frozen and locked into the official standings. Congratulations to all participants!
             </p>
           </div>
 
@@ -103,23 +97,56 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Daily Progress Sync Notice & Midnight Countdown */}
+      {/* Challenge Concluded Widget */}
       <DailySyncWidget />
 
       {/* Podium for Top 3 */}
       {!loading && users.length > 0 && <Podium topThree={users.slice(0, 3)} />}
 
-      {/* Main Leaderboard Table */}
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
+      {/* Leadership / Leaderboard Section */}
+      <div className="space-y-6">
+        {/* Festive Thank You Card for Participants */}
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-950/80 via-[#21160d]/95 to-amber-950/80 border border-amber-500/40 p-6 sm:p-8 backdrop-blur-md shadow-2xl">
+          <div className="absolute top-0 right-0 -translate-y-8 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="relative z-10 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="space-y-2.5 max-w-3xl">
+              <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-bold uppercase tracking-wider">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>GDG IIITN Organizers Note</span>
+              </div>
+              <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2.5">
+                <span>Thank You to All Participants!</span>
+                <Heart className="w-6 h-6 sm:w-7 sm:h-7 text-rose-500 fill-rose-500 inline-block animate-pulse shrink-0" />
+              </h3>
+              <p className="text-sm sm:text-base text-amber-100/90 leading-relaxed">
+                A huge shoutout and heartfelt gratitude to all <strong>{users.length} registered coders</strong> who took part in the GDG Diwali Challenge! Your passion, consistency, and problem-solving drive during the festival vacation were truly inspiring. Congratulations to our top podium finishers and every single student who pushed their coding limits. Keep building, keep solving, and keep shining!
+              </p>
+              <div className="text-xs sm:text-sm text-amber-400 font-semibold pt-1 flex items-center gap-2">
+                <span>— Organized with ❤️ by GDG IIITN • Aditya Singh</span>
+              </div>
+            </div>
+
+            <Link
+              href="/profile"
+              className="flex items-center space-x-2 px-6 py-4 rounded-2xl font-black text-sm sm:text-base bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-xl shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 shrink-0 self-stretch sm:self-auto justify-center cursor-pointer"
+            >
+              <Trophy className="w-5 h-5 text-slate-950" />
+              <span>Get Your Rank Card</span>
+            </Link>
+          </div>
+        </div>
+
+        {/* Standings Header */}
+        <div className="flex items-center justify-between pt-2">
           <h2 className="text-2xl sm:text-3xl font-black text-white flex items-center gap-3 tracking-tight">
-            <span>Standings</span>
+            <span>Final Official Standings</span>
             <span className="text-xs sm:text-sm font-bold text-amber-400 bg-amber-400/10 px-3 py-1 rounded-full border border-amber-400/25 shadow-sm">
-              {users.length} Registered
+              {users.length} Competitors
             </span>
           </h2>
         </div>
 
+        {/* Main Leaderboard Table */}
         {loading ? (
           <div className="w-full bg-slate-900/60 border border-slate-800 rounded-2xl p-12 text-center text-slate-400">
             <RefreshCw className="w-6 h-6 animate-spin mx-auto text-amber-400 mb-2" />
@@ -132,5 +159,3 @@ export default function HomePage() {
     </div>
   );
 }
-
-

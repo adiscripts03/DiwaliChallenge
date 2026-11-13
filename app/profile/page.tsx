@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { User, Save, RefreshCw, CheckCircle2, AlertCircle, Flame, ExternalLink, Clock, Trophy, Sparkles } from 'lucide-react';
+import { User, Save, RefreshCw, CheckCircle2, AlertCircle, Flame, ExternalLink, Clock, Trophy, Sparkles, Lock } from 'lucide-react';
 import PlatformBadge from '@/components/PlatformBadge';
 import RankCardModal from '@/components/RankCardModal';
 
@@ -36,18 +36,8 @@ export default function ProfilePage() {
   const [codeforces, setCodeforces] = useState('');
   const [codechef, setCodechef] = useState('');
   const [saving, setSaving] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [cooldownSeconds, setCooldownSeconds] = useState(0);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [isCardModalOpen, setIsCardModalOpen] = useState(false);
-
-  useEffect(() => {
-    if (cooldownSeconds <= 0) return;
-    const interval = setInterval(() => {
-      setCooldownSeconds((prev) => (prev > 1 ? prev - 1 : 0));
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [cooldownSeconds]);
 
   useEffect(() => {
     fetch('/api/auth/me')
@@ -76,12 +66,7 @@ export default function ProfilePage() {
       const res = await fetch('/api/profile', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          leetcode,
-          codeforces,
-          codechef,
-        }),
+        body: JSON.stringify({ name }),
       });
 
       const data = await res.json();
@@ -89,95 +74,11 @@ export default function ProfilePage() {
 
       setUser(data.user);
       router.refresh();
-      setMessage({ type: 'success', text: 'Handles saved successfully!' });
+      setMessage({ type: 'success', text: 'Display name updated successfully! Platform handles and scores remain locked.' });
     } catch (err: any) {
       setMessage({ type: 'error', text: err.message });
     } finally {
       setSaving(false);
-    }
-  };
-
-  const handleSyncNow = async () => {
-    if (!user) return;
-    setSyncing(true);
-    setMessage(null);
-
-    try {
-      const hasPendingEdits =
-        name.trim() !== (user.name || '').trim() ||
-        leetcode.trim() !== (user.handles?.leetcode || '').trim() ||
-        codeforces.trim() !== (user.handles?.codeforces || '').trim() ||
-        codechef.trim() !== (user.handles?.codechef || '').trim();
-
-      if (hasPendingEdits) {
-        // If user edited their handles in the input fields, save profile (which also syncs solves)
-        const profileRes = await fetch('/api/profile', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name, leetcode, codeforces, codechef }),
-        });
-
-        const profileData = await profileRes.json();
-        if (!profileRes.ok) {
-          throw new Error(profileData.error || 'Failed to update profile');
-        }
-
-        setCooldownSeconds(300);
-        if (profileData?.user) {
-          setUser(profileData.user);
-        }
-        setMessage({
-          type: 'success',
-          text: `Profile saved & synced! Solved today: ${profileData.user?.stats?.todaySolved ?? 0} (Global Total: ${profileData.user?.stats?.totalSolved ?? 0}).`,
-        });
-        return;
-      }
-
-      // Normal sync: directly fetch solves across connected platforms
-      const res = await fetch('/api/sync', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.id }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        if (data.cooldownRemaining) {
-          setCooldownSeconds(data.cooldownRemaining);
-        }
-        throw new Error(data.error || 'Sync failed');
-      }
-
-      // Start 300-second (5 minute) cooldown timer upon successful sync
-      setCooldownSeconds(300);
-
-      // Immediately update local UI cards with the fresh synced stats
-      if (data.userSync?.stats) {
-        setUser((prev) => {
-          if (!prev) return prev;
-          return {
-            ...prev,
-            stats: {
-              ...prev.stats,
-              totalSolved: data.userSync.stats.totalSolved ?? prev.stats.totalSolved,
-              todaySolved: data.userSync.stats.todaySolved ?? prev.stats.todaySolved,
-              leetcode: data.userSync.stats.leetcode ?? prev.stats.leetcode,
-              codeforces: data.userSync.stats.codeforces ?? prev.stats.codeforces,
-              codechef: data.userSync.stats.codechef ?? prev.stats.codechef,
-              lastUpdated: data.userSync.stats.lastUpdated || new Date().toISOString(),
-            },
-          };
-        });
-      }
-
-      setMessage({
-        type: 'success',
-        text: `Sync complete! Solved today: ${data.userSync?.stats?.todaySolved ?? 0} (Global Total: ${data.userSync?.stats?.totalSolved ?? 0}).`,
-      });
-    } catch (err: any) {
-      setMessage({ type: 'error', text: err.message });
-    } finally {
-      setSyncing(false);
     }
   };
 
@@ -212,43 +113,29 @@ export default function ProfilePage() {
               <button
                 onClick={() => setIsCardModalOpen(true)}
                 type="button"
-                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-5 py-3.5 rounded-xl font-black text-sm sm:text-base bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] active:scale-95"
+                className="w-full sm:w-auto flex items-center justify-center space-x-2 px-6 py-3.5 rounded-xl font-black text-sm sm:text-base bg-gradient-to-r from-amber-500 via-amber-400 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-lg shadow-amber-500/25 transition-all hover:scale-[1.02] active:scale-95 cursor-pointer"
               >
                 <Trophy className="w-4 h-4 text-slate-950 shrink-0" />
                 <span>Rank Card</span>
               </button>
 
-              <button
-                onClick={handleSyncNow}
-                disabled={syncing || cooldownSeconds > 0}
-                className={`w-full sm:w-auto flex items-center justify-center space-x-2.5 px-6 py-3.5 rounded-xl font-bold text-sm sm:text-base shadow-lg transition-all ${
-                  syncing || cooldownSeconds > 0
-                    ? 'bg-amber-500/20 text-amber-300/60 border border-amber-500/20 cursor-not-allowed'
-                    : 'bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 hover:scale-[1.02]'
-                }`}
-              >
-                <RefreshCw className={`w-4 h-4 ${syncing ? 'animate-spin' : ''}`} />
-                <span>
-                  {syncing
-                    ? 'Fetching from APIs...'
-                    : cooldownSeconds > 0
-                    ? `Wait ${Math.floor(cooldownSeconds / 60)}m ${cooldownSeconds % 60}s to sync`
-                    : 'Sync My Solves Now'}
-                </span>
-              </button>
+              <div className="w-full sm:w-auto flex items-center justify-center space-x-2 px-4 py-3 rounded-xl font-bold text-xs sm:text-sm bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>Final Scores Locked</span>
+              </div>
             </div>
-            <div className="text-xs sm:text-sm text-amber-400/80 flex items-center justify-center sm:justify-end gap-1.5 font-medium">
-              <Clock className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-              <span>Sync cutoff is 11:59 PM IST tonight</span>
+            <div className="text-xs sm:text-sm text-slate-400 flex items-center justify-center sm:justify-end gap-1.5 font-medium">
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+              <span>Challenge Concluded • Sync Closed</span>
             </div>
           </div>
         </div>
 
-        {/* Nightly Sync Callout */}
-        <div className="mt-6 p-4 sm:p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-start space-x-3 text-sm sm:text-base text-amber-200/90 leading-relaxed">
-          <Clock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+        {/* Challenge Concluded Callout */}
+        <div className="mt-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/15 to-orange-500/10 border border-amber-500/30 flex items-start space-x-3.5 text-sm sm:text-base text-amber-200/90 leading-relaxed shadow-sm">
+          <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
           <p>
-            <strong className="text-amber-300 font-bold">Mandatory Daily Tracking:</strong> Please manually sync all your solved questions before going to sleep. Only synced questions will count towards the leaderboard — unsynced questions will not be considered!
+            <strong className="text-amber-300 font-bold">Challenge Completed!</strong> The 10-day GDG Diwali Challenge has officially ended and final standings are locked. Thank you to everyone for participating! Click <strong className="text-white">Rank Card</strong> above or below to export and share your final rank card on LinkedIn.
           </p>
         </div>
 
@@ -260,8 +147,9 @@ export default function ProfilePage() {
               <Flame className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500 shrink-0" />
               <span>{user.stats?.totalSolved ?? user.stats?.todaySolved ?? 0}</span>
             </div>
-            <div className="text-xs sm:text-sm text-slate-400 mt-1.5 font-medium">
-              +{user.stats?.todaySolved || 0} today
+            <div className="text-xs sm:text-sm text-emerald-400/90 mt-1.5 font-medium flex items-center gap-1">
+              <CheckCircle2 className="w-3.5 h-3.5 shrink-0" />
+              <span>Final Solves Locked</span>
             </div>
           </div>
 
@@ -339,10 +227,18 @@ export default function ProfilePage() {
 
       {/* Settings Form */}
       <div className="bg-slate-900/80 border border-slate-800 rounded-3xl p-6 sm:p-10 backdrop-blur-md shadow-2xl">
-        <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight mb-2">Connected Coding Platforms</h2>
-        <p className="text-sm sm:text-base text-slate-400 mb-8 leading-relaxed">
-          Connect only the platforms you actively use. You do <strong>not</strong> need accounts on all 3 websites. Leave any platforms you don&apos;t use completely blank.
-        </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+          <div>
+            <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight">Connected Coding Platforms</h2>
+            <p className="text-sm sm:text-base text-slate-400 mt-1 leading-relaxed">
+              Platform handles and scores are permanently locked as the challenge has concluded. You may still update your display name.
+            </p>
+          </div>
+          <div className="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-bold text-slate-300 shrink-0 self-start sm:self-auto">
+            <Lock className="w-3.5 h-3.5 text-amber-400" />
+            <span>Handles Locked</span>
+          </div>
+        </div>
 
         {message && (
           <div
@@ -378,49 +274,49 @@ export default function ProfilePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-wider">
-                  LeetCode Handle / URL
+                <label className="text-xs sm:text-sm font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>LeetCode Handle</span>
+                  <Lock className="w-3 h-3 text-slate-500" />
                 </label>
-                <span className="text-xs text-slate-500">Optional</span>
+                <span className="text-xs text-slate-500">Locked</span>
               </div>
               <input
                 type="text"
-                placeholder="Username or profile URL"
+                disabled
                 value={leetcode}
-                onChange={(e) => setLeetcode(e.target.value)}
-                className="w-full bg-slate-950/90 border border-amber-500/30 rounded-xl px-4 py-3 text-base text-slate-100 placeholder-slate-600 focus:outline-none focus:border-amber-400 transition-colors"
+                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3 text-base text-slate-400 cursor-not-allowed select-none"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs sm:text-sm font-bold text-blue-400 uppercase tracking-wider">
-                  Codeforces Handle / URL
+                <label className="text-xs sm:text-sm font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>Codeforces Handle</span>
+                  <Lock className="w-3 h-3 text-slate-500" />
                 </label>
-                <span className="text-xs text-slate-500">Optional</span>
+                <span className="text-xs text-slate-500">Locked</span>
               </div>
               <input
                 type="text"
-                placeholder="Username or profile URL"
+                disabled
                 value={codeforces}
-                onChange={(e) => setCodeforces(e.target.value)}
-                className="w-full bg-slate-950/90 border border-blue-500/30 rounded-xl px-4 py-3 text-base text-slate-100 placeholder-slate-600 focus:outline-none focus:border-blue-400 transition-colors"
+                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3 text-base text-slate-400 cursor-not-allowed select-none"
               />
             </div>
 
             <div>
               <div className="flex items-center justify-between mb-2">
-                <label className="text-xs sm:text-sm font-bold text-emerald-400 uppercase tracking-wider">
-                  CodeChef Handle / URL
+                <label className="text-xs sm:text-sm font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+                  <span>CodeChef Handle</span>
+                  <Lock className="w-3 h-3 text-slate-500" />
                 </label>
-                <span className="text-xs text-slate-500">Optional</span>
+                <span className="text-xs text-slate-500">Locked</span>
               </div>
               <input
                 type="text"
-                placeholder="Username or profile URL"
+                disabled
                 value={codechef}
-                onChange={(e) => setCodechef(e.target.value)}
-                className="w-full bg-slate-950/90 border border-emerald-500/30 rounded-xl px-4 py-3 text-base text-slate-100 placeholder-slate-600 focus:outline-none focus:border-emerald-400 transition-colors"
+                className="w-full bg-slate-950/50 border border-slate-800 rounded-xl px-4 py-3 text-base text-slate-400 cursor-not-allowed select-none"
               />
             </div>
           </div>
@@ -429,10 +325,10 @@ export default function ProfilePage() {
             <button
               type="submit"
               disabled={saving}
-              className="flex items-center space-x-2.5 px-8 py-3.5 rounded-xl font-bold text-sm sm:text-base bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02]"
+              className="flex items-center space-x-2.5 px-8 py-3.5 rounded-xl font-bold text-sm sm:text-base bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-lg shadow-amber-500/20 transition-all hover:scale-[1.02] cursor-pointer"
             >
               <Save className="w-5 h-5" />
-              <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+              <span>{saving ? 'Saving...' : 'Save Name'}</span>
             </button>
           </div>
         </form>
@@ -447,4 +343,3 @@ export default function ProfilePage() {
     </div>
   );
 }
-

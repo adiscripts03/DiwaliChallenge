@@ -97,8 +97,8 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
             <tr>
               <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5 w-24 text-center">Rank</th>
               <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5">Coder Profile</th>
-              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5">Today's Solves by Platform</th>
-              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5 text-right">Global Challenge Solves</th>
+              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5">Verified Platform Solves</th>
+              <th scope="col" className="px-6 sm:px-8 py-4 sm:py-5 text-right">Final Challenge Solves</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-800/70 font-medium">
@@ -210,7 +210,7 @@ export default function LeaderboardTable({ users }: LeaderboardTableProps) {
                           </span>
                         </div>
                         <div className="text-xs sm:text-sm text-slate-400 font-medium mt-1">
-                          {user.stats.todaySolved > 0 ? `+${user.stats.todaySolved} today` : '0 solved today'}
+                          Final Score Locked
                         </div>
                         <div className="progress-track w-28 sm:w-36 lg:w-44 bg-slate-800 rounded-full h-2 mt-2 overflow-hidden shadow-inner">
                           <div

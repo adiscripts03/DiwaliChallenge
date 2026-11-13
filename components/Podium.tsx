@@ -93,7 +93,7 @@ export default function Podium({ topThree }: PodiumProps) {
                   <span>{second.stats?.totalSolved ?? second.stats?.todaySolved ?? 0}</span>
                 </div>
                 <div className="text-xs sm:text-sm text-slate-400 font-medium mt-1">
-                  {second.stats?.todaySolved > 0 ? `+${second.stats.todaySolved} today` : '0 today'}
+                  Final Solves Locked
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
@@ -136,8 +136,8 @@ export default function Podium({ topThree }: PodiumProps) {
                   <Flame className="w-8 h-8 sm:w-10 sm:h-10 text-amber-500 shrink-0" />
                   <span>{first.stats?.totalSolved ?? first.stats?.todaySolved ?? 0}</span>
                 </div>
-                <div className="text-xs sm:text-sm text-amber-300/80 font-semibold mt-1">
-                  {first.stats?.todaySolved > 0 ? `+${first.stats.todaySolved} today` : '0 today'}
+                <div className="text-xs sm:text-sm text-amber-300/90 font-semibold mt-1">
+                  Final Solves Locked
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">
@@ -173,8 +173,8 @@ export default function Podium({ topThree }: PodiumProps) {
                   <Flame className="w-7 h-7 sm:w-8 sm:h-8 text-amber-500 shrink-0" />
                   <span>{third.stats?.totalSolved ?? third.stats?.todaySolved ?? 0}</span>
                 </div>
-                <div className="text-xs sm:text-sm text-slate-400 font-medium mt-1">
-                  {third.stats?.todaySolved > 0 ? `+${third.stats.todaySolved} today` : '0 today'}
+                <div className="text-xs sm:text-sm text-amber-400/80 font-medium mt-1">
+                  Final Solves Locked
                 </div>
               </div>
               <div className="flex flex-wrap gap-1.5 justify-center w-full">

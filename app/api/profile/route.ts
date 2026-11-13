@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { db } from '@/lib/db';
-import { syncUserSolves } from '@/lib/apis/tracker';
-import { sanitizeHandle } from '@/lib/utils/handles';
 
 export async function PUT(req: Request) {
   try {
@@ -11,36 +9,27 @@ export async function PUT(req: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, leetcode, codeforces, codechef, triggerSync } = await req.json();
+    const { name } = await req.json();
 
+    // Since the GDG Diwali Challenge has officially ended, handles and scores are locked.
+    // Users can only update their display name.
     const updatedUser = await db.updateUser(currentUser.id, {
       ...(name ? { name: name.trim() } : {}),
-      handles: {
-        leetcode:
-          leetcode !== undefined ? sanitizeHandle(leetcode, 'leetcode') : currentUser.handles.leetcode,
-        codeforces:
-          codeforces !== undefined ? sanitizeHandle(codeforces, 'codeforces') : currentUser.handles.codeforces,
-        codechef:
-          codechef !== undefined ? sanitizeHandle(codechef, 'codechef') : currentUser.handles.codechef,
-      },
     });
 
     if (!updatedUser) {
       return NextResponse.json({ error: 'User update failed' }, { status: 400 });
     }
 
-    // Automatically trigger a sync whenever handles are modified/removed so that
-    // removed platform scores immediately deduct from the user's score and update the leaderboard.
-    const syncRes = await syncUserSolves(updatedUser);
-
     return NextResponse.json({
       success: true,
+      message: 'Profile updated. Scores and platform handles are locked as the challenge has concluded.',
       user: {
-        id: syncRes.userId,
-        name: syncRes.name,
+        id: updatedUser.id,
+        name: updatedUser.name,
         email: updatedUser.email,
         handles: updatedUser.handles,
-        stats: syncRes.stats,
+        stats: updatedUser.stats,
       },
     });
   } catch (error: any) {
@@ -51,4 +40,5 @@ export async function PUT(req: Request) {
     );
   }
 }
+
 
