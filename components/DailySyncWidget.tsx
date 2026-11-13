@@ -21,7 +21,7 @@ export default function DailySyncWidget() {
             The 10-Day GDG Diwali Coding Challenge has Ended!
           </h3>
           <p className="text-xs sm:text-sm text-amber-100/80 leading-relaxed">
-            All problem solves across LeetCode, Codeforces, and CodeChef have been officially recorded. Syncing is now closed and rankings are permanently frozen. Share your verified rank card on LinkedIn!
+            All problem solves across LeetCode, Codeforces, and CodeChef have been officially recorded. Syncing is now closed and rankings are permanently frozen. Export and share your verified rank card!
           </p>
         </div>
 

@@ -135,7 +135,7 @@ export default function ProfilePage() {
         <div className="mt-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-amber-500/10 via-amber-500/15 to-orange-500/10 border border-amber-500/30 flex items-start space-x-3.5 text-sm sm:text-base text-amber-200/90 leading-relaxed shadow-sm">
           <Sparkles className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
           <p>
-            <strong className="text-amber-300 font-bold">Challenge Completed!</strong> The 10-day GDG Diwali Challenge has officially ended and final standings are locked. Thank you to everyone for participating! Click <strong className="text-white">Rank Card</strong> above or below to export and share your final rank card on LinkedIn.
+            <strong className="text-amber-300 font-bold">Challenge Completed!</strong> The 10-day GDG Diwali Challenge has officially ended and final standings are locked. Thank you to everyone for participating! Click <strong className="text-white">Rank Card</strong> above or below to export and download your final rank card.
           </p>
         </div>
 
@@ -199,18 +199,18 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* LinkedIn Shareable Rank Card Banner */}
+        {/* Shareable Rank Card Banner */}
         <div className="mt-8 relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/15 via-orange-600/15 to-amber-500/10 border-2 border-amber-500/40 p-6 sm:p-8 backdrop-blur-md shadow-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-2xl">
             <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider">
               <Sparkles className="w-3.5 h-3.5" />
-              <span>LinkedIn Shareable Achievement</span>
+              <span>Official Rank Card Achievement</span>
             </div>
             <h3 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-3">
               <span>Generate Your Rank Card</span>
             </h3>
             <p className="text-sm sm:text-base text-amber-100/80 leading-relaxed">
-              Export your official GDG IIITN Rank Card! Showcase your final rank after the challenge, along with verified question counts on LeetCode, Codeforces, and CodeChef to recruiters and peers on LinkedIn.
+              Export your official GDG IIITN Rank Card! Showcase your final rank after the challenge, along with verified question counts on LeetCode, Codeforces, and CodeChef to recruiters and peers.
             </p>
           </div>
 

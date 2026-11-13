@@ -75,14 +75,6 @@ function CodeChefSVG({ className = 'w-4 h-4' }: { className?: string }) {
   );
 }
 
-function LinkedInSVG({ className = 'w-4 h-4' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-label="LinkedIn">
-      <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.2V10.9H6.46M7.83 6.35a1.64 1.64 0 1 0 0 3.28 1.64 1.64 0 0 0 0-3.28" />
-    </svg>
-  );
-}
-
 function DiyaBadgeSVG({ className = 'w-6 h-6' }: { className?: string }) {
   return (
     <svg viewBox="0 0 64 64" fill="none" className={className}>
@@ -121,11 +113,9 @@ export default function RankCardModal({ isOpen, onClose, user }: RankCardModalPr
   const cardRef = useRef<HTMLDivElement>(null);
   const [themeMode, setThemeMode] = useState<'ivory' | 'dark'>('ivory');
   const [downloading, setDownloading] = useState(false);
-  const [sharingLinkedIn, setSharingLinkedIn] = useState(false);
   const [copyingImage, setCopyingImage] = useState(false);
   const [copiedText, setCopiedText] = useState(false);
   const [copiedImageSuccess, setCopiedImageSuccess] = useState(false);
-  const [showShareGuide, setShowShareGuide] = useState(false);
   const [computedRank, setComputedRank] = useState<number>(user.rank || 1);
   const [computedTotal, setComputedTotal] = useState<number>(user.totalParticipants || 12);
 
@@ -341,82 +331,6 @@ Check out my verified rank card attached below! 🎯
     }
   };
 
-  // Direct LinkedIn Sharing:
-  // Instead of passing website URL to LinkedIn offsite sharer (which attaches website preview),
-  // this flow downloads the rank card image, copies the caption text, and opens LinkedIn's post composer!
-  const handleShareLinkedIn = async () => {
-    if (!cardRef.current) return;
-    setSharingLinkedIn(true);
-
-    try {
-      const blob = await toBlob(cardRef.current, {
-        pixelRatio: 2.5,
-        backgroundColor: themeMode === 'ivory' ? '#faf7f2' : '#0d0a07',
-      });
-
-      if (!blob) throw new Error('Blob generation failed');
-
-      const fileName = `${user.name.replace(/\s+/g, '_')}_GDG_Diwali_Rank_Card.png`;
-      const file = new File([blob], fileName, { type: 'image/png' });
-
-      // 1. Mobile & Web Share API support:
-      // If browser can share files directly, open native share sheet (attaches actual image)
-      if (
-        typeof navigator !== 'undefined' &&
-        navigator.canShare &&
-        navigator.canShare({ files: [file] })
-      ) {
-        try {
-          await navigator.share({
-            title: `${user.name}'s GDG Diwali Challenge Rank Card`,
-            text: generateLinkedInText(),
-            files: [file],
-          });
-          return;
-        } catch (shareErr: any) {
-          if (shareErr.name === 'AbortError') return;
-        }
-      }
-
-      // 2. Desktop Flow:
-      // A. Auto-download the high-res card PNG so user has it immediately
-      const downloadUrl = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.download = fileName;
-      link.href = downloadUrl;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => URL.revokeObjectURL(downloadUrl), 5000);
-
-      // B. Copy celebration post text to clipboard
-      await navigator.clipboard.writeText(generateLinkedInText());
-
-      // C. Also copy image blob to clipboard if supported (allows direct Cmd+V / Ctrl+V in LinkedIn!)
-      try {
-        if (typeof ClipboardItem !== 'undefined' && navigator.clipboard && navigator.clipboard.write) {
-          await navigator.clipboard.write([
-            new ClipboardItem({ 'image/png': blob }),
-          ]);
-        }
-      } catch {}
-
-      // D. Open LinkedIn post composer (Start a Post dialog, NOT the website preview URL!)
-      window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank', 'noopener,noreferrer');
-
-      // E. Show guide banner in modal
-      setShowShareGuide(true);
-    } catch (err) {
-      console.error('LinkedIn share error:', err);
-      handleDownload();
-      handleCopyText();
-      window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank', 'noopener,noreferrer');
-      setShowShareGuide(true);
-    } finally {
-      setSharingLinkedIn(false);
-    }
-  };
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/85 backdrop-blur-md overflow-hidden animate-in fade-in duration-200">
       <div className="relative w-full max-w-2xl max-h-[94vh] my-auto bg-[#140e0a] border border-amber-500/30 rounded-3xl shadow-2xl overflow-hidden flex flex-col">
@@ -428,13 +342,13 @@ Check out my verified rank card attached below! 🎯
             </div>
             <div>
               <h2 className="text-base sm:text-lg font-black text-white flex items-center gap-2">
-                <span>LinkedIn Rank Card</span>
+                <span>Official Rank Card</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 uppercase tracking-wider">
                   Final Standing
                 </span>
               </h2>
               <p className="text-xs text-amber-200/70">
-                Official shareable achievement card with verified platform question counts
+                Official verified achievement card with platform question counts
               </p>
             </div>
           </div>
@@ -795,57 +709,25 @@ Check out my verified rank card attached below! 🎯
           </div>
         </div>
 
-        {/* LinkedIn Share Helper Guide Toast */}
-        {showShareGuide && (
-          <div className="mx-4 sm:mx-6 mb-3 p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-amber-500/20 via-orange-500/20 to-amber-500/15 border-2 border-amber-500/40 text-xs sm:text-sm text-amber-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xl animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <div className="space-y-1">
-              <div className="font-black text-amber-300 flex items-center gap-1.5 text-sm">
-                <Check className="w-4 h-4 text-emerald-400 stroke-[3]" />
-                <span>Rank Card Downloaded & Caption Copied!</span>
-              </div>
-              <p className="text-amber-100/90 text-xs leading-relaxed max-w-xl">
-                In LinkedIn&apos;s post creator: <strong>1)</strong> Click the photo icon to attach your downloaded Rank Card (or press <kbd className="px-1.5 py-0.5 rounded bg-black/60 border border-amber-500/40 text-[10px] font-mono text-amber-300">Cmd+V</kbd> / <kbd className="px-1.5 py-0.5 rounded bg-black/60 border border-amber-500/40 text-[10px] font-mono text-amber-300">Ctrl+V</kbd> to paste the image directly!). <strong>2)</strong> Paste your celebration text.
-              </p>
-            </div>
-            <div className="flex items-center gap-2 shrink-0 self-end sm:self-auto">
-              <button
-                onClick={() => window.open('https://www.linkedin.com/feed/?shareActive=true', '_blank', 'noopener,noreferrer')}
-                className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-400 hover:from-amber-400 hover:to-amber-300 text-slate-950 font-black text-xs hover:scale-105 transition-all shadow-md flex items-center gap-1.5 cursor-pointer"
-              >
-                <LinkedInSVG className="w-3.5 h-3.5" />
-                <span>Open LinkedIn</span>
-                <ExternalLink className="w-3 h-3" />
-              </button>
-              <button
-                onClick={() => setShowShareGuide(false)}
-                className="p-1.5 rounded-lg text-amber-300/60 hover:text-white hover:bg-white/10 transition-colors"
-                title="Dismiss"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-        )}
-
         {/* Modal Action Footer */}
         <div className="p-4 sm:p-5 bg-[#160f0a] border-t border-amber-900/40 flex flex-col md:flex-row items-center justify-between gap-3">
           <div className="flex items-center space-x-2 text-xs text-amber-200/80 text-center md:text-left">
             <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-            <span>Official GDG IIITN Rank Card ready for LinkedIn post & celebration!</span>
+            <span>Official GDG IIITN Rank Card • Download or copy to share!</span>
           </div>
 
-          <div className="flex items-center flex-wrap justify-end gap-2 w-full md:w-auto">
+          <div className="flex items-center flex-wrap justify-end gap-2.5 w-full md:w-auto">
             {/* Copy Card Image to Clipboard */}
             <button
               onClick={handleCopyImage}
               disabled={copyingImage}
               type="button"
-              className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl font-bold text-xs border transition-all cursor-pointer ${
+              className={`flex items-center space-x-1.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition-all cursor-pointer ${
                 copiedImageSuccess
                   ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
                   : 'bg-white/5 border-amber-500/30 text-amber-300 hover:bg-white/10'
               }`}
-              title="Copy card image directly to clipboard to paste (Cmd+V) in LinkedIn or chat"
+              title="Copy card image directly to clipboard"
             >
               {copiedImageSuccess ? (
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -859,12 +741,12 @@ Check out my verified rank card attached below! 🎯
             <button
               onClick={handleCopyText}
               type="button"
-              className={`flex items-center space-x-1.5 px-3.5 py-2.5 rounded-xl font-bold text-xs border transition-all cursor-pointer ${
+              className={`flex items-center space-x-1.5 px-4 py-2.5 rounded-xl font-bold text-xs sm:text-sm border transition-all cursor-pointer ${
                 copiedText
                   ? 'bg-emerald-500/20 border-emerald-500 text-emerald-400'
                   : 'bg-white/5 border-amber-500/30 text-amber-300 hover:bg-white/10'
               }`}
-              title="Copy LinkedIn celebration post text"
+              title="Copy achievement text"
             >
               {copiedText ? (
                 <Check className="w-3.5 h-3.5 text-emerald-400" />
@@ -874,24 +756,12 @@ Check out my verified rank card attached below! 🎯
               <span>{copiedText ? 'Caption Copied!' : 'Copy Caption'}</span>
             </button>
 
-            {/* Direct LinkedIn Share */}
-            <button
-              onClick={handleShareLinkedIn}
-              disabled={sharingLinkedIn}
-              type="button"
-              className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-[#0a66c2] hover:bg-[#084e96] text-white shadow-lg shadow-[#0a66c2]/25 transition-all hover:scale-105 active:scale-95 cursor-pointer disabled:opacity-50"
-              title="Download Rank Card image and open LinkedIn post composer"
-            >
-              <LinkedInSVG className="w-4 h-4" />
-              <span>{sharingLinkedIn ? 'Preparing Card...' : 'Share on LinkedIn'}</span>
-            </button>
-
             {/* Download HD Image Button */}
             <button
               onClick={handleDownload}
               disabled={downloading}
               type="button"
-              className="flex items-center space-x-1.5 px-4 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer"
+              className="flex items-center space-x-2 px-6 py-2.5 rounded-xl font-black text-xs sm:text-sm bg-gradient-to-r from-amber-500 via-amber-400 to-amber-500 hover:from-amber-400 hover:to-amber-300 text-slate-950 shadow-lg shadow-amber-500/25 transition-all hover:scale-105 active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Download className={`w-4 h-4 ${downloading ? 'animate-bounce' : ''}`} />
               <span>{downloading ? 'Exporting...' : 'Download Card'}</span>
