@@ -1,42 +1,59 @@
-# 🪔 GDG Diwali Challenge 2026
+# 🪔 GDG Diwali Challenge 2026 [CONCLUDED]
 
 **Production-Grade Multi-Platform Competitive Coding Leaderboard Platform**  
-🌐 **Live Application:** [https://diwalichallenge.onrender.com/](https://diwalichallenge.onrender.com/)  
-👨‍💻 **Solo Architect & Lead Developer:** [Aditya Singh](https://github.com/adiscripts03) ([LinkedIn](https://www.linkedin.com/in/aditya-singh-80827935a/))
+🌐 **Live Platform & Final Standings:** [https://diwalichallenge.onrender.com/](https://diwalichallenge.onrender.com/)  
+👨‍💻 **Solo Architect & Lead Developer:** [Aditya Singh](https://github.com/adiscripts03) ([LinkedIn](https://www.linkedin.com/in/aditya-singh-80827935a/))  
+📅 **Event Dates:** **3rd November – 12th November 2026** (10-Day Sprint) • **Status:** Officially Concluded & Standings Locked
+
+---
+
+## 🏆 Official Winners & Final Podium
+
+The 10-day Diwali Vacation Competitive Programming Challenge has officially wrapped up! Out of **88 registered competitors** from IIIT Nagpur, congratulations to our top podium champions who demonstrated relentless consistency, algorithmic skill, and problem-solving drive throughout the festive break:
+
+| Rank | Champion | College Handle / ID | Total Verified Solves | Award |
+| :---: | :--- | :--- | :---: | :--- |
+| 🥇 **1st Place** | **Archit Kumar** | `bt26csh014` (LC: `lavaroof` • CF: `LavaRoof` • CC: `lavaroof`) | **300** | **Challenge Champion / Gold** |
+| 🥈 **2nd Place** | **Rishik Sahu** | `bt26cse109` (LC: `rishik312007` • CF: `rishik312007` • CC: `rishik312007`) | **273** | **Silver Medalist** |
+| 🥉 **3rd Place** | **Aryan Singh** | `bt26csd041` (LC: `unearthlyimpulse` • CF: `unearthly` • CC: `unearthly`) | **137** | **Bronze Medalist** |
+
+> 🎉 **Official Rank Card Generator:** All 88 participants can export and download their high-resolution official **GDG IIITN Rank Card** directly from their profile to showcase their final rank and verified platform question counts!
 
 ---
 
 ## 📊 Executive Summary & Operational Impact
 
-Built and orchestrated as a full-stack competitive coding platform for **Google Developer Groups (GDG)** at IIITN, hosting a high-stakes 10-day challenge for 1st-year computer science students during the festival break. The platform continuously tracks, verifies, filters, and ranks authentic problem submissions across **LeetCode**, **Codeforces**, and **CodeChef** in real time.
+Built and orchestrated as a full-stack competitive coding platform for **Google Developer Groups (GDG)** at IIITN, hosting a high-stakes 10-day challenge for 1st-year computer science students during the festival break (November 3–12, 2026). The platform continuously tracked, verified, filtered, and ranked authentic problem submissions across **LeetCode**, **Codeforces**, and **CodeChef** in real time.
 
 | Metric | Result |
 | :--- | :--- |
-| **Active Participants** | **82+ registered college coders** |
+| **Contest Status** | **Concluded** (Nov 3 – Nov 12, 2026) • Final Standings Locked |
+| **Total Participants** | **88 registered college coders** |
 | **Supported Platforms** | **LeetCode** (GraphQL) • **Codeforces** (REST) • **CodeChef** (HTTP/Cheerio) |
-| **Contest Duration** | **3rd November – 12th November 2026** (10-Day Sprint) |
-| **Strict Quality Cutoff** | $\ge 800$ difficulty rating threshold (eliminates trivial problems) |
-| **Primary Timezone** | `Asia/Kolkata` (IST - UTC+05:30) with midnight rollovers |
+| **Contest Duration** | **10 Days** (11:59 PM IST daily synchronization checkpoints) |
+| **Strict Quality Cutoff** | $\ge 800$ difficulty rating threshold (eliminated trivial/farmed problems) |
+| **Primary Timezone** | `Asia/Kolkata` (IST - UTC+05:30) with exact midnight rollovers |
 | **Database Architecture** | **Neon Serverless PostgreSQL** with Prisma ORM & disk fallbacks |
-| **Uptime & Reliability** | **Zero downtime** across peak contest hours and nightly sync rushes |
+| **Uptime & Reliability** | **100% Zero Downtime** across peak contest hours and nightly sync rushes |
+| **Shareable Achievement** | Client-side Canvas/DOM **Rank Card Generator** (Ivory & Dark Gold themes) |
 
 ---
 
 ## 🏛️ System Architecture
 
-The application is built on a decoupled, cloud-native architecture designed to withstand external API rate-limiting, Cloudflare challenges, and cold-start connection limits while maintaining zero-stale-data guarantees for live leaderboard rankings.
+The application was built on a decoupled, cloud-native architecture designed to withstand external API rate-limiting, Cloudflare challenges, and cold-start connection limits while maintaining zero-stale-data guarantees for live leaderboard rankings.
 
 ```mermaid
 flowchart TD
     subgraph Client ["Client Layer (Browser)"]
         UI["Next.js 14 Responsive UI<br/>(Tailwind CSS • Light/Dark Theme Engine)"]
-        SyncBtn["Sync Solves Button<br/>(5-Min Cooldown Gate)"]
+        RankCard["Rank Card Modal<br/>(Client Canvas/PNG Generator)"]
         BugModal["In-App Bug Reporting Modal<br/>(Direct to Lead Developer)"]
     end
 
     subgraph Server ["Application Server (Next.js 14 App Router on Render)"]
         API_Lead["/api/leaderboard<br/>(Dynamic Zero-Cache Engine)"]
-        API_Sync["/api/sync<br/>(Rate Limiter & Scraper Orchestrator)"]
+        API_Sync["/api/sync<br/>(Rate Limiter & Scraper Orchestrator • Locked Post-Contest)"]
         API_Admin["/api/admin/*<br/>(RBAC Superuser Control Portal)"]
         API_Bugs["/api/bugs<br/>(Triage & Dispatch Engine)"]
         ScraperEngine["Scraper Engine (lib/apis)"]
@@ -53,8 +70,8 @@ flowchart TD
         DiskCache[("Problem Rating Cache<br/>(In-Memory + Disk JSON)")]
     end
 
-    UI -->|Polls Standings every 30s| API_Lead
-    SyncBtn -->|POST Sync Request| API_Sync
+    UI -->|Queries Frozen Standings| API_Lead
+    RankCard -->|Fetches Final Profile & Rank| API_Lead
     BugModal -->|POST Bug Report| API_Bugs
 
     API_Sync --> ScraperEngine
@@ -78,22 +95,22 @@ flowchart TD
 * **The Solution**:
   - Implemented client-specific retry handlers with `AbortSignal.timeout(22000)` and custom HTTP user-agent rotation.
   - Enforced a per-user **5-minute cooldown (300 seconds)** on profile synchronization requests, preventing participants from bombarding external APIs.
-  - Implemented an **In-Memory & Persistent Disk Problem Rating Cache** (`data/codechef_ratings.json`) in [`lib/apis/codechef.ts`](lib/apis/codechef.ts). Once a problem rating is discovered, it is cached permanently so subsequent syncs for that problem avoid repeat HTTP roundtrips.
+  - Implemented an **In-Memory & Persistent Disk Problem Rating Cache** (`data/codechef_ratings.json`) in [`lib/apis/codechef.ts`](lib/apis/codechef.ts). Once a problem rating was discovered, it was cached permanently so subsequent syncs for that problem avoided repeat HTTP roundtrips.
 
 ### 2. Fair-Play Anti-Cheat: The $\ge 800$ Difficulty Rating Cutoff
 * **The Problem**: In open coding challenges, participants can farm trivial problems (e.g. 100-rating "Hello World" exercises) to artificially inflate their standing without demonstrating real algorithmic skill.
 * **The Solution**:
-  - Established a strict platform-wide quality rule: **only questions with a difficulty rating $\ge 800$ qualify**.
-  - **Codeforces**: The scraper parses `sub.problem.rating` and discards any accepted submissions with ratings under 800 or unrated problems.
-  - **CodeChef**: Queries the CodeChef contest practice difficulty API, checks the numerical rating, and filters out problems below 800.
+  - Established a strict platform-wide quality rule: **only questions with a difficulty rating $\ge 800$ qualified**.
+  - **Codeforces**: The scraper parsed `sub.problem.rating` and discarded any accepted submissions with ratings under 800 or unrated problems.
+  - **CodeChef**: Queried the CodeChef contest practice difficulty API, checked the numerical rating, and filtered out problems below 800.
   - Retroactively purged historical baseline solves under 800 to ensure absolute leaderboard parity across all days.
 
 ### 3. Cross-Timezone Midnight Rollover (UTC Server vs. IST Contest)
-* **The Problem**: The production application runs on cloud infrastructure (Render / AWS) whose system clocks run in UTC (`00:00:00 UTC`), while the challenge operates strictly in Indian Standard Time (`Asia/Kolkata`, UTC+05:30). Naive `new Date().setHours(0,0,0,0)` triggers daily rollovers at 5:30 AM IST instead of midnight, causing participant outrage.
+* **The Problem**: The production application ran on cloud infrastructure (Render / AWS) whose system clocks run in UTC (`00:00:00 UTC`), while the challenge operated strictly in Indian Standard Time (`Asia/Kolkata`, UTC+05:30). Naive `new Date().setHours(0,0,0,0)` triggered daily rollovers at 5:30 AM IST instead of midnight, causing participant outrage.
 * **The Solution**:
   - Engineered [`lib/date.ts`](lib/date.ts) using `Intl.DateTimeFormat` with explicit `Asia/Kolkata` timezone bindings.
   - Designed `getStartOfTodayTimestamp()` to construct exact IST midnight timestamps (`YYYY-MM-DDT00:00:00+05:30`), guaranteeing accurate day boundaries regardless of host server location.
-  - Daily counters automatically reset for the new sprint while preserving each coder's cumulative contest total.
+  - Daily counters automatically reset for the new sprint while preserving each coder's cumulative contest total throughout all 10 days.
 
 ### 4. Zero-Flash Dual Theme Engine (Festive Dark & Golden Ivory Light)
 * **The Problem**: Switching between dark mode and light mode often produces an unsightly jarring flash of white/black during server-side hydration (FOUC).
@@ -105,8 +122,16 @@ flowchart TD
 * **The Problem**: Real-time events require organizers to immediately troubleshoot sync issues, audit participant claims, and respond to platform bugs without direct database access.
 * **The Solution**:
   - Built a secure role-based **Admin Control Center** (`/admin`) protected by signed JWT tokens and Argon/bcrypt credentials.
-  - **Live Participant Management**: Force-sync individual coders (bypassing cooldowns), search and filter across handles, and manually overwrite scores with full audit records.
-  - **Bug & Feedback Triage Desk**: Integrated in-app bug reporting modal and full-page `/report-bug` view where participants report scoring discrepancies. Incoming reports land directly in the Admin portal with status tags (`Open`, `In Progress`, `Resolved`) and admin notes.
+  - **Live Participant Management**: Force-synced individual coders (bypassing cooldowns), searched and filtered across handles, and manually overwrote scores with full audit records.
+  - **Bug & Feedback Triage Desk**: Integrated in-app bug reporting modal and full-page `/report-bug` view where participants reported scoring discrepancies. Incoming reports landed directly in the Admin portal with status tags (`Open`, `In Progress`, `Resolved`) and admin notes.
+
+### 6. Official Post-Challenge Rank Card Generator
+* **The Feature**: Upon challenge conclusion, a custom client-side achievement card exporter was launched.
+* **The Implementation**:
+  - High-res HTML-to-Image renderer producing crisp 2.5x retina PNG cards (`RankCardModal.tsx`).
+  - Available in both **Ivory Light** and **Diwali Dark Gold** themes.
+  - Accurately details final rank (`#X out of 88`), cumulative verified solves, platform handles, and individual question counts for LeetCode, Codeforces, and CodeChef.
+  - Includes direct 1-click **Download Card (PNG)**, **Copy Image to Clipboard**, and pre-formatted achievement caption generator.
 
 ---
 
@@ -117,6 +142,7 @@ flowchart TD
 | **Frontend Framework** | [Next.js 14](https://nextjs.org/) (App Router, Server & Client Components) |
 | **Language** | [TypeScript](https://www.typescriptlang.org/) (Strict mode, end-to-end type safety) |
 | **Styling & Design** | [Tailwind CSS](https://tailwindcss.com/), Lucide Icons, Custom Diwali CSS Animations |
+| **Card Generation** | [html-to-image](https://github.com/bubkoo/html-to-image) (Retina 2.5x pixel ratio DOM canvas exporter) |
 | **Database & ORM** | [Neon Serverless PostgreSQL](https://neon.tech/) with [Prisma ORM](https://www.prisma.io/) |
 | **Connection Pooling** | Prisma Client global singleton with unpooled migration compatibility |
 | **Authentication** | JSON Web Tokens (JWT), HTTP-only secure cookies, `bcryptjs` hashing |
@@ -136,26 +162,28 @@ coding-leaderboard/
 │   │   ├── auth/                     # Register, Login, Me, and Logout endpoints
 │   │   ├── bugs/                     # Bug report submission, triage, and patch APIs
 │   │   ├── leaderboard/              # Ranked standings API (no-cache headers)
-│   │   ├── sync/                     # Per-user solve synchronizer (5m cooldown gate)
+│   │   ├── profile/                  # Profile updates & handle locking
+│   │   ├── sync/                     # Solve synchronizer (locked with HTTP 403 post-event)
 │   │   └── views/                    # Real-time unique page view telemetry
 │   ├── developer/page.tsx            # Solo architect credit & social connections
 │   ├── login/page.tsx                # Participant authentication portal
-│   ├── register/page.tsx             # New coder enrollment (college BT ID)
-│   ├── profile/page.tsx              # Participant dashboard & manual sync center
+│   ├── register/page.tsx             # Coder enrollment portal
+│   ├── profile/page.tsx              # Participant dashboard & Rank Card trigger
 │   ├── report-bug/page.tsx           # Dedicated bug & scoring discrepancy desk
 │   ├── globals.css                   # Custom Light/Dark theme styles & Diya animations
 │   ├── layout.tsx                    # Root layout with zero-flash theme head script
-│   └── page.tsx                      # Main Leaderboard, Podium, and live challenge metrics
+│   └── page.tsx                      # Main Leaderboard, Podium, and final challenge metrics
 ├── components/
 │   ├── BugReportModal.tsx            # Global interactive bug report dialog
 │   ├── BugReportForm.tsx             # Reusable bug report form with category selector
-│   ├── DailySyncWidget.tsx           # Countdown timer & daily sync status indicator
-│   ├── DailySyncReminderBanner.tsx   # Urgent reminder banner for unsynced solves
+│   ├── DailySyncWidget.tsx           # Challenge conclusion showcase & Rank Card prompt
+│   ├── DailySyncReminderBanner.tsx   # Top sticky announcement banner
 │   ├── DiyaBackground.tsx            # Festive Diwali terracotta flame graphics
-│   ├── LeaderboardTable.tsx          # Real-time searchable & platform-filterable table
+│   ├── LeaderboardTable.tsx          # Searchable, platform-filterable final standings table
 │   ├── Navbar.tsx                    # Navigation bar with ThemeToggle & Report Bug action
 │   ├── PlatformBadge.tsx             # Verified LeetCode, Codeforces & CodeChef badges
-│   ├── Podium.tsx                    # Animated gold, silver, bronze top-3 showcase
+│   ├── Podium.tsx                    # Animated gold, silver, bronze top-3 winners showcase
+│   ├── RankCardModal.tsx             # Official Rank Card generator (Ivory & Dark Gold)
 │   ├── ThemeProvider.tsx             # React theme context & localStorage synchronization
 │   └── ThemeToggle.tsx               # Sun / Moon theme toggle button
 ├── lib/
@@ -219,18 +247,20 @@ npx prisma generate
 ```bash
 npm run dev
 ```
-Navigate to [http://localhost:3000](http://localhost:3000) to view the live dashboard.
+Navigate to [http://localhost:3000](http://localhost:3000) to view the application and final standings.
 
 ---
 
-## 🏆 Contest Rules & Platform Verification
+## 📜 Contest Rules & Verification Criteria (Historical)
 
-1. **Daily Sync Deadline**: Participants must click **"Sync My Solves Now"** on their profile before **11:59:59 PM IST** each night.
+During the live 10-day sprint (Nov 3 – Nov 12, 2026), the challenge was governed by the following strict rules:
+
+1. **Daily Sync Deadline**: Participants were required to synchronize solved questions on their profile before **11:59:59 PM IST** each night.
 2. **Platform Scraper Verification**:
    - **LeetCode**: Accepted submissions (`status === "Accepted"`) via GraphQL API.
    - **Codeforces**: Accepted submissions (`verdict === "OK"`) with difficulty rating $\ge 800$.
    - **CodeChef**: Fully accepted 100-point solutions with difficulty rating $\ge 800$.
-3. **Anti-Plagiarism**: Disqualification is automatically enforced for duplicate accounts or identical code submissions across different participants.
+3. **Anti-Plagiarism & Quality Control**: Disqualification was automatically enforced for duplicate accounts or code submissions across different participants. Baseline questions below 800 rating were strictly filtered out.
 
 ---
 
@@ -245,4 +275,4 @@ Navigate to [http://localhost:3000](http://localhost:3000) to view the live dash
 
 ---
 
-*Organized in collaboration with Google Developer Groups (GDG) On Campus IIITN.*
+*Organized in collaboration with Google Developer Groups (GDG) On Campus IIITN (3rd November – 12th November 2026).*
